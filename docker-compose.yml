@@ -1,0 +1,37 @@
+version: '3.9'
+services:
+  typesense:
+    image: typesense/typesense:0.24.0
+    restart: unless-stopped
+    ports:
+      - "8108:8108"
+    volumes:
+      - /home/lena/bfh/seminar/search-engine-volumes/typesense:/data
+    command: '--data-dir /data --api-key=xyz --enable-cors'
+  meilisearch:
+    image: "getmeili/meilisearch:v0.26.1"
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:7700:7700"
+    volumes:
+      - /home/lena/bfh/seminar/search-engine-volumes/meilisearch:/data.ms
+    environment:
+      - MEILI_MASTER_KEY="8e532f2561b39b58a7ba94d15e5fac03bd9301bd031fce0c3568afb5cc91"
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.7.1
+    restart: unless-stopped
+    volumes: 
+      - /home/lena/bfh/seminar/search-engine-volumes/elasticsearch:/usr/share/elasticsearch/data
+    ports: 
+      - "9200:9200"
+    environment: 
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+
+# Health checks:
+# Typesense: curl http://localhost:8108/health
+# Meili: curl -X GET 'http://localhost:7700/health'
+# Elastic: curl -X GET "localhost:9200/_cluster/health?wait_for_status=yellow&timeout=50s&pretty"
+
+# du -h --max-depth=1 search-engine-volumes/
+# du -hs search-engine-volumes/
