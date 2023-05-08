@@ -28,10 +28,5 @@ services:
       - discovery.type=single-node
       - xpack.security.enabled=false
 
-# Health checks:
-# Typesense: curl http://localhost:8108/health
-# Meili: curl -X GET 'http://localhost:7700/health'
-# Elastic: curl -X GET "localhost:9200/_cluster/health?wait_for_status=yellow&timeout=50s&pretty"
-
 # du -h --max-depth=1 search-engine-volumes/
 # du -hs search-engine-volumes/
