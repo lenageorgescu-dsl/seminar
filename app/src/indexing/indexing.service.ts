@@ -5,6 +5,9 @@ import MeiliSearch from 'meilisearch';
 import { firstValueFrom } from 'rxjs';
 import { Client } from 'typesense';
 import { CollectionCreateSchema } from 'typesense/lib/Typesense/Collections';
+import { Client as ElastiClient } from '@elastic/elasticsearch';
+import { estypes } from '@elastic/elasticsearch';
+import { estypesWithBody } from '@elastic/elasticsearch';
 import { readFileSync } from 'fs';
 import * as movies from '/home/lena/bfh/seminar/app/assets/testdata/movies.json';
 
@@ -52,11 +55,64 @@ export class IndexingService implements OnApplicationBootstrap {
       throw new Error();
     }
     //this.typesenseSearch();
-    this.meiliSearch();
-    this.typesenseSearch();
+    // this.meiliSearch();
+    // this.typesenseSearch();
+    this.elasticSearch();
   }
 
-  private async elasticSearch() {}
+  private async elasticSearch() {
+    const client = new ElastiClient({
+      node: 'http://localhost:9200',
+    });
+
+    interface Document {
+      character: string;
+      quote: string;
+    }
+
+    async function run() {
+      //Let's start by indexing some data
+      await client.index({
+        index: 'game-of-thrones',
+        document: {
+          character: 'Ned Stark',
+          quote: 'Winter is coming.',
+        },
+      });
+
+      await client.index({
+        index: 'game-of-thrones',
+        document: {
+          character: 'Daenerys Targaryen',
+          quote: 'I am the blood of the dragon.',
+        },
+      });
+
+      await client.index({
+        index: 'game-of-thrones',
+        document: {
+          character: 'Tyrion Lannister',
+          quote: 'A mind needs books like a sword needs a whetstone.',
+        },
+      });
+
+      // here we are forcing an index refresh, otherwise we will not
+      // get any result in the consequent search
+      await client.indices.refresh({ index: 'game-of-thrones' });
+
+      // Let's search!
+      const result = await client.search<Document>({
+        index: 'game-of-thrones',
+        query: {
+          match: { quote: 'winter' },
+        },
+      });
+
+      console.log(result.hits.hits);
+    }
+
+    run().catch(console.log);
+  }
 
   private async meiliSearch() {
     const client = new MeiliSearch({
