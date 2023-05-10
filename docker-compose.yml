@@ -1,6 +1,7 @@
 version: '3.9'
 services:
   typesense:
+    container_name: 'typesense'
     image: typesense/typesense:0.24.0
     restart: unless-stopped
     ports:
@@ -9,15 +10,17 @@ services:
       - /home/lena/bfh/seminar/search-engine-volumes/typesense:/data
     command: '--data-dir /data --api-key=xyz --enable-cors'
   meilisearch:
+    container_name: 'meili'
     image: "getmeili/meilisearch:v0.26.1"
     restart: unless-stopped
     ports:
       - "127.0.0.1:7700:7700"
     volumes:
       - /home/lena/bfh/seminar/search-engine-volumes/meilisearch:/data.ms
-    environment:
-      - MEILI_MASTER_KEY="8e532f2561b39b58a7ba94d15e5fac03bd9301bd031fce0c3568afb5cc91"
+    # environment:
+    #   - MEILI_MASTER_KEY="8e532f2561b39b58a7ba94d15e5fac03bd9301bd031fce0c3568afb5cc91"
   elasticsearch:
+    container_name: 'elastic'
     image: docker.elastic.co/elasticsearch/elasticsearch:8.7.1
     restart: unless-stopped
     volumes: 

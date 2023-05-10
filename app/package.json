@@ -21,7 +21,8 @@
     "docker:init": "sudo docker compose up",
     "docker:list": "sudo docker ps -a",
     "docker:stop": "sudo docker stop seminar-typesense-1 && sudo docker stop seminar-meilisearch-1 && sudo docker stop seminar-elasticsearch-1",
-    "docker:restart": "sudo docker restart seminar-typesense-1 && sudo docker restart seminar-meilisearch-1 && sudo docker restart seminar-elasticsearch-1"
+    "docker:restart": "sudo docker restart seminar-typesense-1 && sudo docker restart seminar-meilisearch-1 && sudo docker restart seminar-elasticsearch-1",
+    "docker:reboot": "sudo docker compose down && sudo docker rm -f $(docker ps -a -q) && sudo docker volume rm $(docker volume ls -q) && sudo docker compose up"
   },
   "dependencies": {
     "@babel/runtime": "^7.21.5",
@@ -30,6 +31,7 @@
     "@nestjs/core": "^9.0.0",
     "@nestjs/platform-express": "^9.0.0",
     "axios": "^1.4.0",
+    "meilisearch": "^0.32.3",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0",
     "typesense": "^1.5.3"

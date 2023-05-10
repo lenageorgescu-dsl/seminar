@@ -1,10 +1,13 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
-import { readFileSync } from 'fs';
 import { readFile } from 'fs/promises';
+import MeiliSearch from 'meilisearch';
 import { firstValueFrom } from 'rxjs';
 import { Client } from 'typesense';
 import { CollectionCreateSchema } from 'typesense/lib/Typesense/Collections';
+import { readFileSync } from 'fs';
+import * as movies from '/home/lena/bfh/seminar/app/assets/testdata/movies.json';
+
 @Injectable()
 export class IndexingService implements OnApplicationBootstrap {
   constructor(private readonly http: HttpService) {}
@@ -13,7 +16,7 @@ export class IndexingService implements OnApplicationBootstrap {
   }
   public async pingServer(): Promise<void> {
     try {
-      const { status, data } = await firstValueFrom(
+      const { status } = await firstValueFrom(
         this.http.get('http://localhost:8108/health', {
           responseType: 'stream',
         }),
@@ -25,7 +28,7 @@ export class IndexingService implements OnApplicationBootstrap {
       throw new Error();
     }
     try {
-      const { status, data } = await firstValueFrom(
+      const { status } = await firstValueFrom(
         this.http.get('http://localhost:7700/health', {
           responseType: 'stream',
         }),
@@ -37,7 +40,7 @@ export class IndexingService implements OnApplicationBootstrap {
       throw new Error();
     }
     try {
-      const { status, data } = await firstValueFrom(
+      const { status } = await firstValueFrom(
         this.http.get(
           'http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=50s&pretty',
         ),
@@ -48,10 +51,48 @@ export class IndexingService implements OnApplicationBootstrap {
       console.log(e);
       throw new Error();
     }
-    this.createTypeSenseCollection();
+    //this.typesenseSearch();
+    this.meiliSearch();
+    this.typesenseSearch();
   }
 
-  private async createTypeSenseCollection() {
+  private async elasticSearch() {}
+
+  private async meiliSearch() {
+    const client = new MeiliSearch({
+      host: 'http://localhost:7700',
+    });
+    // const movies = JSON.parse(
+    //   readFileSync('../app/assets/testdata/movies.json', 'utf-8'),
+    // );
+    const documents = [
+      { id: 1, title: 'Carol', genres: ['Romance', 'Drama'] },
+      { id: 2, title: 'Wonder Woman', genres: ['Action', 'Adventure'] },
+      { id: 3, title: 'Life of Pi', genres: ['Adventure', 'Drama'] },
+      {
+        id: 4,
+        title: 'Mad Max: Fury Road',
+        genres: ['Adventure', 'Science Fiction'],
+      },
+      { id: 5, title: 'Moana', genres: ['Fantasy', 'Action'] },
+      { id: 6, title: 'Philadelphia', genres: ['Drama'] },
+    ];
+
+    try {
+      await client
+        .index('docs')
+        .addDocuments(documents)
+        .then((res) => console.log(res));
+    } catch (e) {
+      console.log(e);
+    }
+    client
+      .index('docs')
+      .search('Pi')
+      .then((res) => console.log(res));
+  }
+
+  private async typesenseSearch() {
     const client = new Client({
       nodes: [
         {
@@ -81,7 +122,9 @@ export class IndexingService implements OnApplicationBootstrap {
       .catch((e) => {
         console.log(e);
       });
-    const booksInJson1 = await (await readFile('/tmp/books.jsonl')).toString();
+    const booksInJson1 = await (
+      await readFile('../app/assets/testdata/books.jsonl')
+    ).toString();
     if (booksInJson1 == undefined) throw new Error('File not found');
     client.collections('books').documents().import(booksInJson1);
     const searchParameters = {
@@ -94,7 +137,7 @@ export class IndexingService implements OnApplicationBootstrap {
       .documents()
       .search(searchParameters)
       .then(function (searchResults) {
-        console.log(JSON.stringify(searchResults));
+        console.log(JSON.stringify(searchResults, null, 2));
       });
   }
 }
