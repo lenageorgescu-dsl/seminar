@@ -10,6 +10,8 @@ import { HealthService } from './health/health.service';
 import { Client } from 'typesense';
 import MeiliSearch from 'meilisearch';
 import { Client as ElastiClient } from '@elastic/elasticsearch';
+import { SearchService } from './search/search.service';
+import { ExperimentService } from './experiment/experiment.service';
 
 const typeSenseProvider: Provider = {
   provide: 'Typesense',
@@ -53,6 +55,8 @@ const elasticProvider: Provider = {
     typeSenseProvider,
     meiliProvider,
     elasticProvider,
+    SearchService,
+    ExperimentService,
   ],
 })
 export class AppModule {}
