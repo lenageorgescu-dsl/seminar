@@ -12,7 +12,7 @@ export class SearchService {
   ) {}
 
   public async searchData() {
-    //await this.meili.searchCollection();
+    await this.meili.searchCollection('foo', 'bar');
     await this.typesense.searchCollection('foo', 'bar');
     //await this.elastic.searchCollection();
   }

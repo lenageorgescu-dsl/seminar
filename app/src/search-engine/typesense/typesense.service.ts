@@ -29,9 +29,9 @@ export class TypesenseService extends SearchEngineService {
 
   async searchCollection(collectionName: string, query: string) {
     const searchParameters = {
-      q: 'harry potter',
+      q: 'Great',
       query_by: 'title',
-      sort_by: 'ratings_count:desc',
+      // sort_by: 'ratings_count:desc',
     };
     this.client
       .collections(collectionName)

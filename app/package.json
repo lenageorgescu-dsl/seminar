@@ -21,7 +21,6 @@
     "docker:init": "sudo docker compose up",
     "docker:list": "sudo docker ps -a",
     "docker:stop": "sudo docker stop seminar-typesense-1 && sudo docker stop seminar-meilisearch-1 && sudo docker stop seminar-elasticsearch-1",
-    "docker:restart": "sudo docker restart seminar-typesense-1 && sudo docker restart seminar-meilisearch-1 && sudo docker restart seminar-elasticsearch-1",
     "docker:reboot": "sudo docker compose down && sudo rm -rf ../search-engine-volumes/elasticsearch && sudo rm -rf ../search-engine-volumes/meilisearch && sudo rm -rf ../search-engine-volumes/typesense && mkdir ../search-engine-volumes/elasticsearch && mkdir ../search-engine-volumes/meilisearch && mkdir ../search-engine-volumes/typesense && docker compose up"
   },
   "dependencies": {
