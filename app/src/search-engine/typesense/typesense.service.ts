@@ -1,13 +1,16 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { readFile } from 'fs/promises';
 import { Client } from 'typesense';
 import { CollectionCreateSchema } from 'typesense/lib/Typesense/Collections';
+import { SearchEngineService } from '../search-engine.service';
 
 @Injectable()
-export class TypesenseService {
-  constructor(@Inject('Typesense') private client: Client) {}
+export class TypesenseService extends SearchEngineService {
+  constructor(@Inject('Typesense') private client: Client) {
+    super();
+    this.engineName = 'Typesense';
+  }
 
-  async createCollection(collectionName: string, data: any) {
+  protected override async createCollection(collectionName: string, data: any) {
     const booksSchema = {
       name: collectionName,
       fields: [{ name: '.*', type: 'auto' }],
