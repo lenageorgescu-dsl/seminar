@@ -12,8 +12,8 @@ export class SearchService {
   ) {}
 
   public async searchData() {
-    await this.meili.searchCollection();
-    await this.typesense.searchCollection();
-    await this.elastic.searchCollection();
+    //await this.meili.searchCollection();
+    await this.typesense.searchCollection('foo', 'bar');
+    //await this.elastic.searchCollection();
   }
 }

@@ -7,18 +7,10 @@ import { CollectionCreateSchema } from 'typesense/lib/Typesense/Collections';
 export class TypesenseService {
   constructor(@Inject('Typesense') private client: Client) {}
 
-  async createCollection() {
+  async createCollection(collectionName: string, data: any) {
     const booksSchema = {
-      name: 'books',
-      fields: [
-        { name: 'title', type: 'string' },
-        { name: 'authors', type: 'string[]', facet: true },
-
-        { name: 'publication_year', type: 'int32', facet: true },
-        { name: 'ratings_count', type: 'int32' },
-        { name: 'average_rating', type: 'float' },
-      ],
-      default_sorting_field: 'ratings_count',
+      name: collectionName,
+      fields: [{ name: '.*', type: 'auto' }],
     };
     await this.client
       .collections()
@@ -26,28 +18,29 @@ export class TypesenseService {
       .catch((e) => {
         console.log(e);
       });
+    await this.client
+      .collections(collectionName)
+      .documents()
+      .import(data, { action: 'create' }); //works much better with the addition of {action: 'create'}
   }
 
-  async addDataToCollection() {
-    const booksInJson1 = await (
-      await readFile('../app/assets/testdata/books.jsonl')
-    ).toString();
-    if (booksInJson1 == undefined) throw new Error('File not found');
-    this.client.collections('books').documents().import(booksInJson1);
-  }
-
-  async searchCollection() {
+  async searchCollection(collectionName: string, query: string) {
     const searchParameters = {
       q: 'harry potter',
       query_by: 'title',
       sort_by: 'ratings_count:desc',
     };
     this.client
-      .collections('books')
+      .collections(collectionName)
       .documents()
       .search(searchParameters)
       .then(function (searchResults) {
         console.log(JSON.stringify(searchResults, null, 2));
       });
+  }
+
+  async retrieve(collectionName: string) {
+    console.log(collectionName);
+    this.client.collections(collectionName).retrieve();
   }
 }
