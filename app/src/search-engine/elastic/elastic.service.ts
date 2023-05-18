@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Client } from '@elastic/elasticsearch';
 import { estypes } from '@elastic/elasticsearch';
 import { estypesWithBody } from '@elastic/elasticsearch';
+import { SearchEngineService } from '../search-engine.service';
 
 interface Document {
   character: string;
@@ -9,43 +10,31 @@ interface Document {
 }
 
 @Injectable()
-export class ElasticService {
-  constructor(@Inject('ElasticSearch') private client: Client) {}
+export class ElasticService extends SearchEngineService {
+  constructor(@Inject('ElasticSearch') private client: Client) {
+    super();
+    this.engineName = 'Elastic';
+  }
 
-  async createCollection() {
-    await this.client.index({
-      index: 'game-of-thrones',
-      document: {
-        character: 'Ned Stark',
-        quote: 'Winter is coming.',
-      },
-    });
-
-    await this.client.index({
-      index: 'game-of-thrones',
-      document: {
-        character: 'Daenerys Targaryen',
-        quote: 'I am the blood of the dragon.',
-      },
-    });
-
-    await this.client.index({
-      index: 'game-of-thrones',
-      document: {
-        character: 'Tyrion Lannister',
-        quote: 'A mind needs books like a sword needs a whetstone.',
+  protected async createCollection(collectionName: string, data: any) {
+    await this.client.helpers.bulk({
+      datasource: data,
+      onDocument(doc) {
+        return {
+          index: { _index: collectionName },
+        };
       },
     });
   }
 
-  async searchCollection() {
-    await this.client.indices.refresh({ index: 'game-of-thrones' });
+  async searchCollection(collectionName: string, query: string) {
+    await this.client.indices.refresh({ index: collectionName });
 
     // Let's search!
     const result = await this.client.search<Document>({
-      index: 'game-of-thrones',
+      index: collectionName,
       query: {
-        match: { quote: 'winter' },
+        match: { title: 'Great' },
       },
     });
 

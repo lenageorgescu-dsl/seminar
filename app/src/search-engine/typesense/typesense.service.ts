@@ -41,9 +41,4 @@ export class TypesenseService extends SearchEngineService {
         console.log(JSON.stringify(searchResults, null, 2));
       });
   }
-
-  async retrieve(collectionName: string) {
-    console.log(collectionName);
-    this.client.collections(collectionName).retrieve();
-  }
 }

@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { TypesenseService } from '../search-engine/typesense/typesense.service';
 import { MeiliService } from '../search-engine/meili/meili.service';
 import { ElasticService } from '../search-engine/elastic/elastic.service';
-import { readFile } from 'fs/promises';
 import testdata from 'assets/testdata/test.json';
 
 @Injectable()
@@ -15,6 +14,6 @@ export class IndexingService {
   async indexData() {
     await this.typesense.indexDocuments('foo', testdata, 'bar');
     await this.meili.indexDocuments('foo', testdata, 'bar');
-    //await this.elastic.createCollection();
+    await this.elastic.indexDocuments('foo', testdata, 'bar');
   }
 }
