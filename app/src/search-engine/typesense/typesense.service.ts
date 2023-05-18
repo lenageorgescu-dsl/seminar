@@ -11,13 +11,13 @@ export class TypesenseService extends SearchEngineService {
   }
 
   protected override async createCollection(collectionName: string, data: any) {
-    const booksSchema = {
+    const schema = {
       name: collectionName,
       fields: [{ name: '.*', type: 'auto' }],
     };
     await this.client
       .collections()
-      .create(booksSchema as CollectionCreateSchema)
+      .create(schema as CollectionCreateSchema)
       .catch((e) => {
         console.log(e);
       });
@@ -27,18 +27,43 @@ export class TypesenseService extends SearchEngineService {
       .import(data, { action: 'create' }); //works much better with the addition of {action: 'create'}
   }
 
-  async searchCollection(collectionName: string, query: string) {
-    const searchParameters = {
-      q: 'Great',
-      query_by: 'title',
-      // sort_by: 'ratings_count:desc',
-    };
+  // async searchCollection(collectionName: string, query: string) {
+  //   const searchParameters = {
+  //     q: 'the',
+  //     query_by: 'authors, title',
+  //     // sort_by: 'ratings_count:desc',
+  //   };
+  //   this.client
+  //     .collections(collectionName)
+  //     .documents()
+  //     .search(searchParameters)
+  //     .then(function (searchResults) {
+  //       console.log(JSON.stringify(searchResults, null, 2));
+  //     });
+  // }
+
+  protected override async searchKeyWords(
+    collectionName: string,
+    keyword: string,
+    fields: string[],
+  ) {
+    const query_by: string = this.formatFields(fields);
+    const searchParams = { q: keyword, query_by: query_by };
     this.client
       .collections(collectionName)
       .documents()
-      .search(searchParameters)
+      .search(searchParams)
       .then(function (searchResults) {
         console.log(JSON.stringify(searchResults, null, 2));
       });
+  }
+
+  private formatFields(fields: string[]): string {
+    let res = fields[0];
+    for (let i = 1; i < fields.length; i++) {
+      res += ', ';
+      res += fields[i];
+    }
+    return res;
   }
 }

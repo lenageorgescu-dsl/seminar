@@ -12,8 +12,12 @@ export class SearchService {
   ) {}
 
   public async searchData() {
-    await this.meili.searchCollection('foo', 'bar');
-    await this.typesense.searchCollection('foo', 'bar');
-    await this.elastic.searchCollection('foo', 'bar');
+    await this.typesense.keywordSearch('test', 'the', ['title', 'authors']);
+    //await this.meili.searchCollection('foo', 'bar');
+    //await this.elastic.searchCollection('foo', 'bar');
   }
+
+  // public async searchTypeSense(collectionName: string, keyword: string) {
+  //   await this.typesense.searchCollection(collectionName, keyword);
+  // }
 }
