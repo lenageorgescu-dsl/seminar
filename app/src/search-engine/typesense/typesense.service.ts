@@ -49,7 +49,8 @@ export class TypesenseService extends SearchEngineService {
   ) {
     const query_by: string = this.formatFields(fields);
     const searchParams = { q: keyword, query_by: query_by };
-    this.client
+    console.log('query: ', searchParams);
+    await this.client
       .collections(collectionName)
       .documents()
       .search(searchParams)

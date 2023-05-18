@@ -13,16 +13,6 @@ export class AppController {
   }
 }
 
-@Controller('index')
-export class IndexController {
-  constructor(private readonly indexService: IndexingService) {}
-
-  @Get('typesense/:collection')
-  async indexTypeSense(@Param() params: any) {
-    return await this.indexService.indexTypeSense(params.collection);
-  }
-}
-
 @Controller('search')
 export class SearchController {
   constructor(private readonly searchService: SearchService) {}

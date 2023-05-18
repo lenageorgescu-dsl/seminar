@@ -1,24 +1,23 @@
 import { Injectable } from '@nestjs/common';
+import { writeFileSync } from 'fs';
 
 @Injectable()
 export abstract class SearchEngineService {
   protected engineName: string;
 
-  public async indexDocuments(
-    collectionName: string,
-    data: any,
-    resultFilename: string,
-  ) {
+  public async indexDocuments(collectionName: string, data: any) {
     const startTime = Date.now();
     await this.createCollection(collectionName, data);
     const endTime = Date.now();
-    console.log({
+    const res = JSON.stringify({
       engine: this.engineName,
       operation: 'index',
+      collection: collectionName,
       startTime,
       endTime,
       running: endTime - startTime,
     });
+    writeFileSync(`${this.engineName}-${collectionName}-index.txt`, res);
   }
 
   protected createCollection(collectionName: string, data: any) {
@@ -37,13 +36,19 @@ export abstract class SearchEngineService {
     const startTime = Date.now();
     await this.searchKeyWords(collectionName, keyword, fields);
     const endTime = Date.now();
-    console.log({
+    const data = JSON.stringify({
       engine: this.engineName,
       operation: 'keywordSearch',
+      collection: collectionName,
+      keyword: keyword,
       startTime,
       endTime,
       running: endTime - startTime,
     });
+    writeFileSync(
+      `${this.engineName}-keywordSearch-${collectionName}-${keyword}.txt`,
+      data,
+    );
   }
 
   public placeholderSearch() {
