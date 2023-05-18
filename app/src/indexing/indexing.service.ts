@@ -3,7 +3,6 @@ import { TypesenseService } from '../search-engine/typesense/typesense.service';
 import { MeiliService } from '../search-engine/meili/meili.service';
 import { ElasticService } from '../search-engine/elastic/elastic.service';
 import { readFileSync } from 'fs';
-import { readFile } from 'fs/promises';
 
 @Injectable()
 export class IndexingService {
@@ -13,10 +12,13 @@ export class IndexingService {
     private elastic: ElasticService,
   ) {}
   async indexData() {
-    //const musk = this.loadData('../app/assets/testdata/books.jsonl');
-    const test = this.loadData('../app/assets/data/set2.json');
-    await this.typesense.indexDocuments('test', test);
-    console.log('finished');
+    const test = this.loadData('../app/assets/data/test.json');
+
+    const musk = this.loadData('../app/assets/data/musk.json');
+    await this.meili.indexDocuments('musk', musk);
+    console.log('finished indexing musk');
+    await this.meili.indexDocuments('test', test);
+    console.log('finished indexing test');
     //await this.meili.indexDocuments('foo', elon, 'bar');
     //await this.elastic.indexDocuments('foo', elon, 'bar');
   }

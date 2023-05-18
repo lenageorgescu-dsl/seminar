@@ -13,7 +13,10 @@ export class SearchService {
 
   public async searchData() {
     //await this.typesense.keywordSearch('test', 'the', ['title', 'authors']);
-    await this.typesense.keywordSearch('test', 'JolyJoy', ['author']);
+    //await this.typesense.keywordSearch('test', 'dark', ['text']);
+    // await this.meili.searchCollection('test', 'rowling');
+    await this.meili.searchCollection('musk', 'rowling');
+    console.log('finished search');
     //await this.meili.searchCollection('foo', 'bar');
     //await this.elastic.searchCollection('foo', 'bar');
   }

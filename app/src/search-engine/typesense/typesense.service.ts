@@ -21,10 +21,14 @@ export class TypesenseService extends SearchEngineService {
       .catch((e) => {
         console.log(e);
       });
-    await this.client
-      .collections(collectionName)
-      .documents()
-      .import(data, { action: 'create' }); //works much better with the addition of {action: 'create'}
+    try {
+      await this.client
+        .collections(collectionName)
+        .documents()
+        .import(data, { action: 'create' }); //works much better with the addition of {action: 'create'}
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   // async searchCollection(collectionName: string, query: string) {

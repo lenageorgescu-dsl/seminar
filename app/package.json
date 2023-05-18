@@ -34,6 +34,7 @@
     "meilisearch": "^0.32.3",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0",
+    "set-interval-async": "^3.0.3",
     "typesense": "^1.5.3"
   },
   "devDependencies": {
