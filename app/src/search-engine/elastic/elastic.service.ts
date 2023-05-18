@@ -17,14 +17,20 @@ export class ElasticService extends SearchEngineService {
   }
 
   protected async createCollection(collectionName: string, data: any) {
-    await this.client.helpers.bulk({
-      datasource: data,
-      onDocument(doc) {
-        return {
-          index: { _index: collectionName },
-        };
-      },
-    });
+    try {
+      await this.client.helpers
+        .bulk({
+          datasource: data,
+          onDocument(doc) {
+            return {
+              index: { _index: collectionName },
+            };
+          },
+        })
+        .then((res) => console.log(res));
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   async searchCollection(collectionName: string, query: string) {
@@ -34,7 +40,7 @@ export class ElasticService extends SearchEngineService {
     const result = await this.client.search<Document>({
       index: collectionName,
       query: {
-        match: { title: 'Great' },
+        match: { text: 'Rowling' },
       },
     });
 

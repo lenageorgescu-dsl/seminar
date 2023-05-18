@@ -15,10 +15,11 @@ export class IndexingService {
     const test = this.loadData('../app/assets/data/test.json');
 
     const musk = this.loadData('../app/assets/data/musk.json');
-    await this.meili.indexDocuments('musk', musk);
+    // await this.meili.indexDocuments('musk', musk);
+    await this.elastic.indexDocuments('musk', musk);
     console.log('finished indexing musk');
-    await this.meili.indexDocuments('test', test);
-    console.log('finished indexing test');
+    // await this.elastic.indexDocuments('test', test);
+    // console.log('finished indexing test');
     //await this.meili.indexDocuments('foo', elon, 'bar');
     //await this.elastic.indexDocuments('foo', elon, 'bar');
   }
