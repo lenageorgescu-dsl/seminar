@@ -11,8 +11,12 @@ export class MeiliService extends SearchEngineService {
   }
 
   protected override async createCollection(collectionName: string, data: any) {
-    const res = await this.client.getTasks({ indexUids: [collectionName] });
-    if (res.results.length > 0 && !this.allTasksFailed(res.results)) {
+    console.log('collectionName: ', collectionName);
+    const res = (await this.client.getTasks({ indexUids: [] })).results.filter(
+      (task) => task.indexUid == collectionName,
+    ); //getTasks({indexUids: ['xy']}) doesn't work
+    console.log('Tasks first: ', res);
+    if (res.length > 0 && !this.allTasksFailed(res)) {
       //if task already exists and those tasks haven't all failed, don't create new task
       console.log(
         'Task ' + collectionName + ' already exists, will not be indexed again',
@@ -26,9 +30,9 @@ export class MeiliService extends SearchEngineService {
         .then((res) => {
           console.log(res);
         });
-      const tasks = await this.client.getTasks({ indexUids: [collectionName] });
-      console.log('tasks here:', tasks.results);
-      const id = tasks.results.pop().uid;
+      const id = (await this.client.getTasks({ indexUids: [] })).results
+        .filter((task) => task.indexUid == collectionName)
+        .pop().uid; //getTasks({indexUids: ['xy']}) doesn't work
       await this.checkStatus(id);
     } catch (e) {
       console.log(e);
