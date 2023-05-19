@@ -4,6 +4,7 @@ import { writeFileSync } from 'fs';
 @Injectable()
 export abstract class SearchEngineService {
   protected engineName: string;
+  protected experimentNumber = 42;
 
   public async indexDocuments(collectionName: string, data: any) {
     const startTime = Date.now();
@@ -17,7 +18,10 @@ export abstract class SearchEngineService {
       endTime,
       running: endTime - startTime,
     });
-    writeFileSync(`${this.engineName}-${collectionName}-index.txt`, res);
+    writeFileSync(
+      `${this.engineName}-${collectionName}-index-${this.experimentNumber}.txt`,
+      res,
+    );
   }
 
   protected createCollection(collectionName: string, data: any) {
