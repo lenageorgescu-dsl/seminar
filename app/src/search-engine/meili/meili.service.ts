@@ -5,25 +5,34 @@ import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async';
 
 @Injectable()
 export class MeiliService extends SearchEngineService {
-  private static taskUid = 0;
   constructor(@Inject('MeiliSearch') private client: MeiliSearch) {
     super();
     this.engineName = 'Meili';
   }
 
   protected override async createCollection(collectionName: string, data: any) {
+    const res = await this.client.getTasks({ indexUids: [collectionName] });
+    console.log('length in the start: ', res.results.length);
+    if (res.results.length > 0) {
+      console.log(
+        'Task ' + collectionName + ' already exists, will not be indexed again',
+      );
+      return;
+    }
     try {
       await this.client
         .index(collectionName)
         .addDocuments(data)
-        .then(async (res) => {
+        .then((res) => {
           console.log(res);
         });
+      const tasks = await this.client.getTasks({ indexUids: [collectionName] });
+      console.log('tasks here:', tasks.results);
+      const id = tasks.results[0].uid;
+      await this.checkStatus(id);
     } catch (e) {
       console.log(e);
     }
-    await this.checkStatus(MeiliService.taskUid);
-    ++MeiliService.taskUid;
   }
 
   async searchCollection(collectionName: string, query: string) {
