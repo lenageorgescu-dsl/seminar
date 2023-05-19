@@ -51,6 +51,8 @@ export class MeiliService extends SearchEngineService {
     console.log('taskId: ', id);
     console.log(status);
     if (status == 'succeeded') return true;
+    if (status == 'failed')
+      throw new Error('indexing meili collection failed: taskId ' + id);
     return false;
   }
 }

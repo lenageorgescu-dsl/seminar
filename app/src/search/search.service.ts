@@ -12,14 +12,12 @@ export class SearchService {
   ) {}
 
   public async searchData() {
-    //await this.typesense.keywordSearch('test', 'the', ['title', 'authors']);
-    //await this.typesense.keywordSearch('test', 'dark', ['text']);
-    // await this.meili.searchCollection('test', 'rowling');
-    // await this.meili.searchCollection('musk', 'rowling');
-    // console.log('finished search');
-    //await this.meili.searchCollection('foo', 'bar');
-    //await this.elastic.searchCollection('musk', 'rowling');
-    await this.elastic.searchCollection('musk', 'Rowling');
+    // await this.typesense.keywordSearch('musk', 'rowling', ['text']);
+    // console.log('typesense search');
+    await this.meili.searchCollection('set2', 'JolyJoy');
+    console.log('meili search');
+    // await this.elastic.searchCollection('musk', 'rowling');
+    // console.log('elastic search');
   }
 
   // public async searchTypeSense(collectionName: string, keyword: string) {

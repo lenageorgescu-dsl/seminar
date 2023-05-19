@@ -40,7 +40,7 @@ export class ElasticService extends SearchEngineService {
     const result = await this.client.search<Document>({
       index: collectionName,
       query: {
-        match: { text: 'Rowling' },
+        match: { text: query },
       },
     });
 

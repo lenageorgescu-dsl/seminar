@@ -11,17 +11,23 @@ export class IndexingService {
     private meili: MeiliService,
     private elastic: ElasticService,
   ) {}
-  async indexData() {
-    const test = this.loadData('../app/assets/data/test.json');
 
-    const musk = this.loadData('../app/assets/data/musk.json');
-    // await this.meili.indexDocuments('musk', musk);
-    await this.elastic.indexDocuments('musk', musk);
-    console.log('finished indexing musk');
-    // await this.elastic.indexDocuments('test', test);
-    // console.log('finished indexing test');
-    //await this.meili.indexDocuments('foo', elon, 'bar');
-    //await this.elastic.indexDocuments('foo', elon, 'bar');
+  public async indexTypeSense(collectionName: string) {
+    const data = this.loadData(`../app/assets/data/${collectionName}.json`);
+    await this.typesense.indexDocuments(collectionName, data);
+    console.log('Typensense index finished: ', collectionName);
+  }
+
+  public async indexMeili(collectionName: string) {
+    const data = this.loadData(`../app/assets/data/${collectionName}.json`);
+    await this.meili.indexDocuments(collectionName, data);
+    console.log('Meili index finished: ', collectionName);
+  }
+
+  public async indexElastic(collectionName: string) {
+    const data = this.loadData(`../app/assets/data/${collectionName}.json`);
+    await this.elastic.indexDocuments(collectionName, data);
+    console.log('Elastic index finished: ', collectionName);
   }
 
   private loadData(path: string) {

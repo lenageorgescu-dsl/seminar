@@ -1,6 +1,10 @@
 import { HttpModule } from '@nestjs/axios';
 import { Module, Provider } from '@nestjs/common';
-import { AppController, SearchController } from './app.controller';
+import {
+  AppController,
+  IndexController,
+  SearchController,
+} from './app.controller';
 import { AppService } from './app.service';
 import { IndexingService } from './indexing/indexing.service';
 import { ElasticService } from './search-engine/elastic/elastic.service';
@@ -44,7 +48,7 @@ const elasticProvider: Provider = {
 
 @Module({
   imports: [HttpModule],
-  controllers: [AppController, SearchController],
+  controllers: [AppController, SearchController, IndexController],
   providers: [
     AppService,
     IndexingService,
