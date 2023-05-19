@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import MeiliSearch from 'meilisearch';
+import MeiliSearch, { Task, TasksResults } from 'meilisearch';
 import { SearchEngineService } from '../search-engine.service';
 import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async';
 
@@ -12,8 +12,8 @@ export class MeiliService extends SearchEngineService {
 
   protected override async createCollection(collectionName: string, data: any) {
     const res = await this.client.getTasks({ indexUids: [collectionName] });
-    console.log('length in the start: ', res.results.length);
-    if (res.results.length > 0) {
+    if (res.results.length > 0 && !this.allTasksFailed(res.results)) {
+      //if task already exists and those tasks haven't all failed, don't create new task
       console.log(
         'Task ' + collectionName + ' already exists, will not be indexed again',
       );
@@ -33,6 +33,13 @@ export class MeiliService extends SearchEngineService {
     } catch (e) {
       console.log(e);
     }
+  }
+
+  allTasksFailed(arr: Task[]): boolean {
+    for (let i = 0; i < arr.length; i++) {
+      if (arr[i].status != 'failed') return false;
+    }
+    return true;
   }
 
   async searchCollection(collectionName: string, query: string) {
