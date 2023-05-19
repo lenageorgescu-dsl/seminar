@@ -28,7 +28,7 @@ export class MeiliService extends SearchEngineService {
         });
       const tasks = await this.client.getTasks({ indexUids: [collectionName] });
       console.log('tasks here:', tasks.results);
-      const id = tasks.results[0].uid;
+      const id = tasks.results.pop().uid;
       await this.checkStatus(id);
     } catch (e) {
       console.log(e);
