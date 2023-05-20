@@ -33,17 +33,32 @@ export class ElasticService extends SearchEngineService {
     }
   }
 
-  async searchCollection(collectionName: string, query: string) {
-    await this.client.indices.refresh({ index: collectionName });
+  // async searchCollection(collectionName: string, query: string) {
+  //   await this.client.indices.refresh({ index: collectionName });
 
-    // Let's search!
+  //   // Let's search!
+  //   const result = await this.client.search<Document>({
+  //     index: collectionName,
+  //     query: {
+  //       match: { text: query },
+  //     },
+  //   });
+
+  //   console.log(result.hits.hits);
+  // }
+
+  protected override async multiMatchQuery(
+    collectionName: string,
+    keyword: string,
+    fields: string[],
+  ) {
+    await this.client.indices.refresh({ index: collectionName });
     const result = await this.client.search<Document>({
       index: collectionName,
       query: {
-        match: { text: query },
+        multi_match: { query: keyword, fields: fields },
       },
     });
-
     console.log(result.hits.hits);
   }
 }

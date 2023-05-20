@@ -38,7 +38,7 @@ export abstract class SearchEngineService {
     fields: string[],
   ) {
     const startTime = Date.now();
-    await this.searchKeyWords(collectionName, keyword, fields);
+    await this.multiMatchQuery(collectionName, keyword, fields);
     const endTime = Date.now();
     const data = JSON.stringify({
       engine: this.engineName,
@@ -71,7 +71,14 @@ export abstract class SearchEngineService {
   //   });
   // }
 
-  protected searchKeyWords(
+  protected placeholderQuery(collectionName: string, fields: string[]) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve('keywordSearch');
+      }, 5000);
+    });
+  }
+  protected multiMatchQuery(
     collectionName: string,
     keyword: string,
     fields: string[],

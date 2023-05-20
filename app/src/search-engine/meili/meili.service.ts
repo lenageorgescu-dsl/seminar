@@ -39,17 +39,33 @@ export class MeiliService extends SearchEngineService {
     }
   }
 
-  allTasksFailed(arr: Task[]): boolean {
-    for (let i = 0; i < arr.length; i++) {
-      if (arr[i].status != 'failed') return false;
-    }
-    return true;
-  }
+  // async searchCollection(collectionName: string, query: string) {
+  //   await this.client
+  //     .index(collectionName)
+  //     .search(query)
+  //     .then((res) => console.log(res));
+  // }
 
-  async searchCollection(collectionName: string, query: string) {
+  protected override async multiMatchQuery(
+    collectionName: string,
+    keyword: string,
+    fields: string[],
+  ) {
     await this.client
       .index(collectionName)
-      .search(query)
+      .search(keyword, {
+        attributesToRetrieve: fields,
+      })
+      .then((res) => console.log(res));
+  }
+
+  protected override async placeholderQuery(
+    collectionName: string,
+    fields: string[],
+  ) {
+    await this.client
+      .index(collectionName)
+      .search()
       .then((res) => console.log(res));
   }
 
@@ -74,5 +90,12 @@ export class MeiliService extends SearchEngineService {
     if (status == 'failed')
       throw new Error('indexing meili collection failed: taskId ' + id);
     return false;
+  }
+
+  private allTasksFailed(arr: Task[]): boolean {
+    for (let i = 0; i < arr.length; i++) {
+      if (arr[i].status != 'failed') return false;
+    }
+    return true;
   }
 }

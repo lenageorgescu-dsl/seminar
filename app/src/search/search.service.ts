@@ -12,12 +12,8 @@ export class SearchService {
   ) {}
 
   public async searchData() {
-    // await this.typesense.keywordSearch('musk', 'rowling', ['text']);
-    // console.log('typesense search');
-    await this.meili.searchCollection('set2', 'JolyJoy');
-    console.log('meili search');
-    // await this.elastic.searchCollection('musk', 'rowling');
-    // console.log('elastic search');
+    await this.typesense.keywordbla('tweets', 'dark');
+    console.log('foo');
   }
 
   // public async searchTypeSense(collectionName: string, keyword: string) {

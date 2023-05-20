@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { readFileSync } from 'fs';
 import { Client } from 'typesense';
 import { CollectionCreateSchema } from 'typesense/lib/Typesense/Collections';
 import { SearchEngineService } from '../search-engine.service';
@@ -31,6 +32,21 @@ export class TypesenseService extends SearchEngineService {
     }
   }
 
+  private getAllKeys(collectionName: string) {
+    const file = readFileSync(
+      `../app/assets/data/${collectionName}.json`,
+      'utf-8',
+    );
+    const data = JSON.parse(file)[0];
+    const arr = Object.entries(data);
+    const filteredArr = arr.filter(function ([key, value]) {
+      return typeof value == 'string' && key != 'id';
+    });
+    const newObj = Object.fromEntries(filteredArr);
+    const keys = Object.keys(newObj);
+    return keys;
+  }
+
   // async searchCollection(collectionName: string, query: string) {
   //   const searchParameters = {
   //     q: 'the',
@@ -46,7 +62,21 @@ export class TypesenseService extends SearchEngineService {
   //     });
   // }
 
-  protected override async searchKeyWords(
+  public async keywordbla(collectionName: string, keyword: string) {
+    const keys = this.getAllKeys(collectionName);
+    const formatetKeys = this.formatFields(keys);
+    const searchParams = { q: keyword, query_by: formatetKeys };
+    console.log('query: ', searchParams);
+    await this.client
+      .collections(collectionName)
+      .documents()
+      .search(searchParams)
+      .then(function (searchResults) {
+        console.log(JSON.stringify(searchResults, null, 2));
+      });
+  }
+
+  protected override async multiMatchQuery(
     collectionName: string,
     keyword: string,
     fields: string[],
