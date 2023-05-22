@@ -35,13 +35,6 @@ export class MeiliService extends SearchEngineService {
     await this.checkStatus(id);
   }
 
-  // async searchCollection(collectionName: string, query: string) {
-  //   await this.client
-  //     .index(collectionName)
-  //     .search(query)
-  //     .then((res) => console.log(res));
-  // }
-
   protected override async multiMatchQuery(
     collectionName: string,
     keyword: string,
