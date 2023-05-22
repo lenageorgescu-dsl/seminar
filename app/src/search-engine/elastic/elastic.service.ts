@@ -50,6 +50,17 @@ export class ElasticService extends SearchEngineService {
   //   console.log(result.hits.hits);
   // }
 
+  protected override async placeholderQuery(collectionName: string) {
+    await this.client.indices.refresh({ index: collectionName });
+    const result = await this.client.search<Document>({
+      index: collectionName,
+      query: {
+        match_all: {},
+      },
+    });
+    console.log(JSON.stringify(result.hits.hits, null, 2));
+  }
+
   protected override async multiMatchQuery(
     collectionName: string,
     keyword: string,
