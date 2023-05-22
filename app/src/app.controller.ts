@@ -1,7 +1,9 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { AppService } from './app.service';
 import { ExperimentService } from './experiment/experiment.service';
-import { IndexingService } from './indexing/indexing.service';
+import { ElasticService } from './search-engine/elastic/elastic.service';
+import { MeiliService } from './search-engine/meili/meili.service';
+import { TypesenseService } from './search-engine/typesense/typesense.service';
 import { SearchService } from './search/search.service';
 
 @Controller()
@@ -16,7 +18,11 @@ export class AppController {
 
 @Controller('index')
 export class IndexController {
-  constructor(private readonly service: IndexingService) {}
+  constructor(
+    private typesense: TypesenseService,
+    private meili: MeiliService,
+    private elastic: ElasticService,
+  ) {}
 
   @Get()
   async index(): Promise<string> {
@@ -25,19 +31,19 @@ export class IndexController {
 
   @Get('typesense/:collectionName')
   async indexTypesense(@Param('collectionName') name: string): Promise<string> {
-    await this.service.indexTypeSense(name);
+    await this.typesense.indexDocuments(name);
     return 'Index Typesense Controller finished';
   }
 
   @Get('meili/:collectionName')
   async indexMeili(@Param('collectionName') name: string): Promise<string> {
-    await this.service.indexMeili(name);
+    await this.meili.indexDocuments(name);
     return 'Index Meili Controller finished';
   }
 
   @Get('elastic/:collectionName')
   async indexElastic(@Param('collectionName') name: string): Promise<string> {
-    await this.service.indexElastic(name);
+    await this.elastic.indexDocuments(name);
     return 'Index Elastic Controller finished';
   }
 }

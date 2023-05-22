@@ -7,7 +7,6 @@ import {
   SearchController,
 } from './app.controller';
 import { AppService } from './app.service';
-import { IndexingService } from './indexing/indexing.service';
 import { ElasticService } from './search-engine/elastic/elastic.service';
 import { MeiliService } from './search-engine/meili/meili.service';
 import { TypesenseService } from './search-engine/typesense/typesense.service';
@@ -57,7 +56,6 @@ const elasticProvider: Provider = {
   ],
   providers: [
     AppService,
-    IndexingService,
     ElasticService,
     MeiliService,
     TypesenseService,

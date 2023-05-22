@@ -1,14 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { dockerContainers, dockerContainerStats } from 'dockerstats';
-import { writeFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 
 @Injectable()
 export abstract class SearchEngineService {
   protected engineName: string;
   protected experimentNumber = 42;
 
-  public async indexDocuments(collectionName: string, data: any) {
+  public async indexDocuments(collectionName: string) {
     try {
+      const data = this.loadData(`../app/assets/data/${collectionName}.json`);
       const startTime = Date.now();
       await this.createCollection(collectionName, data);
       const containerData = await this.getContainerData(this.engineName);
@@ -139,5 +140,11 @@ export abstract class SearchEngineService {
       res += fields[i];
     }
     return res;
+  }
+
+  private loadData(path: string) {
+    const file = readFileSync(path, 'utf-8');
+    const data = JSON.parse(file);
+    return data;
   }
 }
