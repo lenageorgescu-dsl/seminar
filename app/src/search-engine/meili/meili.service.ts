@@ -23,20 +23,16 @@ export class MeiliService extends SearchEngineService {
       );
       return;
     }
-    try {
-      await this.client
-        .index(collectionName)
-        .addDocuments(data)
-        .then((res) => {
-          console.log(res);
-        });
-      const id = (await this.client.getTasks({ indexUids: [] })).results
-        .filter((task) => task.indexUid == collectionName)
-        .pop().uid; //getTasks({indexUids: ['xy']}) doesn't work
-      await this.checkStatus(id);
-    } catch (e) {
-      console.log(e);
-    }
+    await this.client
+      .index(collectionName)
+      .addDocuments(data)
+      .then((res) => {
+        console.log(res);
+      });
+    const id = (await this.client.getTasks({ indexUids: [] })).results
+      .filter((task) => task.indexUid == collectionName)
+      .pop().uid; //getTasks({indexUids: ['xy']}) doesn't work
+    await this.checkStatus(id);
   }
 
   // async searchCollection(collectionName: string, query: string) {

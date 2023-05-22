@@ -17,20 +17,23 @@ export class ElasticService extends SearchEngineService {
   }
 
   protected async createCollection(collectionName: string, data: any) {
-    try {
-      await this.client.helpers
-        .bulk({
-          datasource: data,
-          onDocument(doc) {
-            return {
-              index: { _index: collectionName },
-            };
-          },
-        })
-        .then((res) => console.log(res));
-    } catch (e) {
-      console.log(e);
-    }
+    const res = await this.client.indices.exists({ index: collectionName });
+    if (res)
+      throw new Error(
+        'Collection ' + collectionName + ' already exists in Elastic',
+      );
+    console.log('exist result: ', res);
+
+    await this.client.helpers
+      .bulk({
+        datasource: data,
+        onDocument(doc) {
+          return {
+            index: { _index: collectionName },
+          };
+        },
+      })
+      .then((res) => console.log(res));
   }
 
   // async searchCollection(collectionName: string, query: string) {

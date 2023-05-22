@@ -16,20 +16,11 @@ export class TypesenseService extends SearchEngineService {
       name: collectionName,
       fields: [{ name: '.*', type: 'auto' }],
     };
+    await this.client.collections().create(schema as CollectionCreateSchema);
     await this.client
-      .collections()
-      .create(schema as CollectionCreateSchema)
-      .catch((e) => {
-        console.log(e);
-      });
-    try {
-      await this.client
-        .collections(collectionName)
-        .documents()
-        .import(data, { action: 'create' }); //works much better with the addition of {action: 'create'}
-    } catch (e) {
-      console.log(e);
-    }
+      .collections(collectionName)
+      .documents()
+      .import(data, { action: 'create' }); //works much better with the addition of {action: 'create'}
   }
 
   private getAllKeys(collectionName: string) {

@@ -7,21 +7,25 @@ export abstract class SearchEngineService {
   protected experimentNumber = 42;
 
   public async indexDocuments(collectionName: string, data: any) {
-    const startTime = Date.now();
-    await this.createCollection(collectionName, data);
-    const endTime = Date.now();
-    const res = JSON.stringify({
-      engine: this.engineName,
-      operation: 'index',
-      collection: collectionName,
-      startTime,
-      endTime,
-      running: endTime - startTime,
-    });
-    writeFileSync(
-      `${this.engineName}-${collectionName}-index-${this.experimentNumber}.txt`,
-      res,
-    );
+    try {
+      const startTime = Date.now();
+      await this.createCollection(collectionName, data);
+      const endTime = Date.now();
+      const res = JSON.stringify({
+        engine: this.engineName,
+        operation: 'index',
+        collection: collectionName,
+        startTime,
+        endTime,
+        running: endTime - startTime,
+      });
+      writeFileSync(
+        `${this.engineName}-${collectionName}-index-${this.experimentNumber}.txt`,
+        res,
+      );
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   protected createCollection(collectionName: string, data: any) {
@@ -37,22 +41,26 @@ export abstract class SearchEngineService {
     keyword: string,
     fields: string[],
   ) {
-    const startTime = Date.now();
-    await this.multiMatchQuery(collectionName, keyword, fields);
-    const endTime = Date.now();
-    const data = JSON.stringify({
-      engine: this.engineName,
-      operation: 'keywordSearch',
-      collection: collectionName,
-      keyword: keyword,
-      startTime,
-      endTime,
-      running: endTime - startTime,
-    });
-    writeFileSync(
-      `${this.engineName}-keywordSearch-${collectionName}-${keyword}.txt`,
-      data,
-    );
+    try {
+      const startTime = Date.now();
+      await this.multiMatchQuery(collectionName, keyword, fields);
+      const endTime = Date.now();
+      const data = JSON.stringify({
+        engine: this.engineName,
+        operation: 'keywordSearch',
+        collection: collectionName,
+        keyword: keyword,
+        startTime,
+        endTime,
+        running: endTime - startTime,
+      });
+      writeFileSync(
+        `${this.engineName}-keywordSearch-${collectionName}-${keyword}.txt`,
+        data,
+      );
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   public placeholderSearch() {
