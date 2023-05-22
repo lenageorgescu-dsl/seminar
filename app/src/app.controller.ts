@@ -1,5 +1,6 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { AppService } from './app.service';
+import { ExperimentService } from './experiment/experiment.service';
 import { IndexingService } from './indexing/indexing.service';
 import { SearchService } from './search/search.service';
 
@@ -48,5 +49,16 @@ export class SearchController {
   @Get()
   search() {
     return this.searchService.searchData();
+  }
+}
+
+@Controller('experiment')
+export class ExperimentController {
+  constructor(private readonly experiment: ExperimentService) {}
+
+  @Get(':version')
+  async run(@Param('version') version: number) {
+    await this.experiment.runExperiment(version);
+    return 'Experiment Controller finished';
   }
 }

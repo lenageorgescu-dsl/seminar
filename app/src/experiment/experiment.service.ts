@@ -12,7 +12,9 @@ export class ExperimentService implements OnApplicationBootstrap {
   ) {}
   async onApplicationBootstrap() {
     await this.healthService.checkHealth();
-    //await this.indexService.indexData();
-    //await this.searchService.searchData();
+  }
+
+  async runExperiment(version: number) {
+    console.log('running experiment');
   }
 }
