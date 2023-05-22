@@ -38,47 +38,17 @@ export class TypesenseService extends SearchEngineService {
     return keys;
   }
 
-  // async searchCollection(collectionName: string, query: string) {
-  //   const searchParameters = {
-  //     q: 'the',
-  //     query_by: 'authors, title',
-  //     // sort_by: 'ratings_count:desc',
-  //   };
-  //   this.client
-  //     .collections(collectionName)
-  //     .documents()
-  //     .search(searchParameters)
-  //     .then(function (searchResults) {
-  //       console.log(JSON.stringify(searchResults, null, 2));
-  //     });
-  // }
-
-  public async keywordbla(collectionName: string, keyword: string) {
-    const keys = this.getAllKeys(collectionName);
-    const formatetKeys = this.stringifyFields(keys);
-    const searchParams = { q: keyword, query_by: formatetKeys };
-    console.log('query: ', searchParams);
-    await this.client
-      .collections(collectionName)
-      .documents()
-      .search(searchParams)
-      .then(function (searchResults) {
-        console.log(JSON.stringify(searchResults, null, 2));
-      });
-  }
-
   protected override async placeholderQuery(collectionName: string) {
     const keys = this.getAllKeys(collectionName);
-    const formatetKeys = this.stringifyFields(keys);
-    const searchParams = { q: '', query_by: formatetKeys };
-    console.log('query: ', searchParams);
-    await this.client
+    const formatedKeys = this.stringifyFields(keys);
+    const searchParams = { q: '', query_by: formatedKeys };
+    //console.log('query: ', searchParams);
+    const res = await this.client
       .collections(collectionName)
       .documents()
-      .search(searchParams)
-      .then(function (searchResults) {
-        console.log(JSON.stringify(searchResults, null, 2));
-      });
+      .search(searchParams);
+    //console.log(JSON.stringify(res, null, 2));
+    return res.found;
   }
 
   protected override async multiMatchQuery(
@@ -89,12 +59,11 @@ export class TypesenseService extends SearchEngineService {
     const query_by: string = this.stringifyFields(fields);
     const searchParams = { q: keyword, query_by: query_by };
     console.log('query: ', searchParams);
-    await this.client
+    const res = await this.client
       .collections(collectionName)
       .documents()
-      .search(searchParams)
-      .then(function (searchResults) {
-        console.log(JSON.stringify(searchResults, null, 2));
-      });
+      .search(searchParams);
+    //console.log(JSON.stringify(res, null, 2));
+    return res.found;
   }
 }

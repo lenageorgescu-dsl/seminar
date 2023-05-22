@@ -57,7 +57,8 @@ export abstract class SearchEngineService {
   ) {
     try {
       const startTime = Date.now();
-      await this.multiMatchQuery(collectionName, keyword, fields);
+      const hits = await this.multiMatchQuery(collectionName, keyword, fields);
+      console.log(hits);
       const containerData = await this.getContainerData(this.engineName);
       const endTime = Date.now();
       const data = JSON.stringify({
@@ -65,6 +66,7 @@ export abstract class SearchEngineService {
         operation: 'keywordSearch',
         collection: collectionName,
         keyword: keyword,
+        hits: hits,
         startTime,
         endTime,
         running: endTime - startTime,
@@ -83,13 +85,15 @@ export abstract class SearchEngineService {
   public async placeholderSearch(collectionName: string) {
     try {
       const startTime = Date.now();
-      await this.placeholderQuery(collectionName);
+      const hits = await this.placeholderQuery(collectionName);
+      console.log('hits: ', hits);
       const containerData = await this.getContainerData(this.engineName);
       const endTime = Date.now();
       const data = JSON.stringify({
         engine: this.engineName,
         operation: 'keywordSearch',
         collection: collectionName,
+        hits: hits,
         startTime,
         endTime,
         running: endTime - startTime,

@@ -14,7 +14,6 @@ export class SearchService {
   public async searchData() {
     //await this.typesense.keywordbla('tweets', 'dark');
     await this.typesense.placeholderSearch('test');
-    console.log('foo');
   }
 
   // public async searchTypeSense(collectionName: string, keyword: string) {
