@@ -40,19 +40,15 @@ export class MeiliService extends SearchEngineService {
     keyword: string,
     fields: string[],
   ) {
-    await this.client
-      .index(collectionName)
-      .search(keyword, {
-        attributesToRetrieve: fields,
-      })
-      .then((res) => console.log(res));
+    const res = await this.client.index(collectionName).search(keyword, {
+      attributesToRetrieve: fields,
+    });
+    return res.hits.length;
   }
 
   protected override async placeholderQuery(collectionName: string) {
-    await this.client
-      .index(collectionName)
-      .search()
-      .then((res) => console.log(res));
+    const res = await this.client.index(collectionName).search();
+    return res.hits.length;
   }
 
   private async checkStatus(taskId: number) {
