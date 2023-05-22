@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { dockerContainers, dockerContainerStats } from 'dockerstats';
 import { writeFileSync } from 'fs';
 
 @Injectable()
@@ -10,6 +11,7 @@ export abstract class SearchEngineService {
     try {
       const startTime = Date.now();
       await this.createCollection(collectionName, data);
+      const containerData = await this.getContainerData(this.engineName);
       const endTime = Date.now();
       const res = JSON.stringify({
         engine: this.engineName,
@@ -18,6 +20,8 @@ export abstract class SearchEngineService {
         startTime,
         endTime,
         running: endTime - startTime,
+        memPercent: containerData.memPercent,
+        cpuPercent: containerData.cpuPercent,
       });
       writeFileSync(
         `${this.engineName}-${collectionName}-index-${this.experimentNumber}.txt`,
@@ -36,6 +40,15 @@ export abstract class SearchEngineService {
     });
   }
 
+  private async getContainerData(name: string) {
+    const container = (await dockerContainers())
+      .filter((container) => container.name == name)
+      .pop();
+    const id = container.id;
+    const data = (await dockerContainerStats(id)).pop();
+    return data;
+  }
+
   public async keywordSearch(
     collectionName: string,
     keyword: string,
@@ -44,6 +57,7 @@ export abstract class SearchEngineService {
     try {
       const startTime = Date.now();
       await this.multiMatchQuery(collectionName, keyword, fields);
+      const containerData = await this.getContainerData(this.engineName);
       const endTime = Date.now();
       const data = JSON.stringify({
         engine: this.engineName,
@@ -53,6 +67,8 @@ export abstract class SearchEngineService {
         startTime,
         endTime,
         running: endTime - startTime,
+        memPercent: containerData.memPercent,
+        cpuPercent: containerData.cpuPercent,
       });
       writeFileSync(
         `${this.engineName}-keywordSearch-${collectionName}-${keyword}.txt`,

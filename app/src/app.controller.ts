@@ -2,7 +2,6 @@ import { Controller, Get, Param } from '@nestjs/common';
 import { AppService } from './app.service';
 import { IndexingService } from './indexing/indexing.service';
 import { SearchService } from './search/search.service';
-import { dockerContainers, dockerContainerStats } from 'dockerstats';
 
 @Controller()
 export class AppController {
@@ -20,30 +19,7 @@ export class IndexController {
 
   @Get()
   async index(): Promise<string> {
-    await this.dockerContainers();
     return 'foobar';
-  }
-
-  async dockerContainers() {
-    console.log('gugus');
-    try {
-      const meili = (await dockerContainers())
-        .filter((container) => container.name == 'meili')
-        .pop();
-      console.log(meili);
-      const id = meili.id;
-      const data = (await dockerContainerStats(id)).pop();
-      console.log('Docker Container Stats:');
-      console.log(data);
-      // console.log('- ID: ' + data.id);
-      // console.log('- Mem usage: ' + data.memUsage);
-      // console.log('- Mem limit: ' + data.memLimit);
-      // console.log('- Mem usage %: ' + data.memPercent);
-      // console.log('- CPU usage %: ' + data.cpuPercent);
-      // console.log('...');
-    } catch (e) {
-      console.log(e);
-    }
   }
 
   @Get('typesense/:collectionName')
