@@ -48,10 +48,7 @@ export class MeiliService extends SearchEngineService {
       .then((res) => console.log(res));
   }
 
-  protected override async placeholderQuery(
-    collectionName: string,
-    fields: string[],
-  ) {
+  protected override async placeholderQuery(collectionName: string) {
     await this.client
       .index(collectionName)
       .search()

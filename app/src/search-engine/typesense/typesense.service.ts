@@ -67,12 +67,10 @@ export class TypesenseService extends SearchEngineService {
       });
   }
 
-  protected override async placeholderQuery(
-    collectionName: string,
-    fields: string[],
-  ) {
-    const query_by: string = this.stringifyFields(fields);
-    const searchParams = { q: '', query_by: query_by };
+  protected override async placeholderQuery(collectionName: string) {
+    const keys = this.getAllKeys(collectionName);
+    const formatetKeys = this.stringifyFields(keys);
+    const searchParams = { q: '', query_by: formatetKeys };
     console.log('query: ', searchParams);
     await this.client
       .collections(collectionName)

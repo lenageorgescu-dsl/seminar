@@ -80,10 +80,10 @@ export abstract class SearchEngineService {
     }
   }
 
-  public async placeholderSearch(collectionName: string, fields: string[]) {
+  public async placeholderSearch(collectionName: string) {
     try {
       const startTime = Date.now();
-      await this.placeholderQuery(collectionName, fields);
+      await this.placeholderQuery(collectionName);
       const containerData = await this.getContainerData(this.engineName);
       const endTime = Date.now();
       const data = JSON.stringify({
@@ -105,7 +105,7 @@ export abstract class SearchEngineService {
     }
   }
 
-  protected placeholderQuery(collectionName: string, fields: string[]) {
+  protected placeholderQuery(collectionName: string) {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve('placeholderQuery');
