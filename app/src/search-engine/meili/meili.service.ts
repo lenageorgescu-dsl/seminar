@@ -7,7 +7,7 @@ import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async';
 export class MeiliService extends SearchEngineService {
   constructor(@Inject('MeiliSearch') private client: MeiliSearch) {
     super();
-    this.engineName = 'Meili';
+    this.engineName = 'meili';
   }
 
   protected override async createCollection(collectionName: string, data: any) {

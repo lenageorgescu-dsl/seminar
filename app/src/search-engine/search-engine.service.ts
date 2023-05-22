@@ -11,6 +11,7 @@ export abstract class SearchEngineService {
     try {
       const startTime = Date.now();
       await this.createCollection(collectionName, data);
+      console.log('engine name : ' + this.engineName);
       const containerData = await this.getContainerData(this.engineName);
       const endTime = Date.now();
       const res = JSON.stringify({
@@ -79,29 +80,39 @@ export abstract class SearchEngineService {
     }
   }
 
-  public placeholderSearch() {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve('bar');
-      }, 5000);
-    });
+  public async placeholderSearch(collectionName: string, fields: string[]) {
+    try {
+      const startTime = Date.now();
+      await this.placeholderQuery(collectionName, fields);
+      const containerData = await this.getContainerData(this.engineName);
+      const endTime = Date.now();
+      const data = JSON.stringify({
+        engine: this.engineName,
+        operation: 'keywordSearch',
+        collection: collectionName,
+        startTime,
+        endTime,
+        running: endTime - startTime,
+        memPercent: containerData.memPercent,
+        cpuPercent: containerData.cpuPercent,
+      });
+      writeFileSync(
+        `${this.engineName}-placeholderSearch-${collectionName}.txt`,
+        data,
+      );
+    } catch (e) {
+      console.log(e);
+    }
   }
-
-  // public federatedSearch() {
-  //   return new Promise((resolve) => {
-  //     setTimeout(() => {
-  //       resolve('baz');
-  //     }, 5000);
-  //   });
-  // }
 
   protected placeholderQuery(collectionName: string, fields: string[]) {
     return new Promise((resolve) => {
       setTimeout(() => {
-        resolve('keywordSearch');
+        resolve('placeholderQuery');
       }, 5000);
     });
   }
+
   protected multiMatchQuery(
     collectionName: string,
     keyword: string,
@@ -109,8 +120,17 @@ export abstract class SearchEngineService {
   ) {
     return new Promise((resolve) => {
       setTimeout(() => {
-        resolve('keywordSearch');
+        resolve('multimatchQuery');
       }, 5000);
     });
+  }
+
+  protected stringifyFields(fields: string[]): string {
+    let res = fields[0];
+    for (let i = 1; i < fields.length; i++) {
+      res += ', ';
+      res += fields[i];
+    }
+    return res;
   }
 }

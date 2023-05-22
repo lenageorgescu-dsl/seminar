@@ -8,7 +8,7 @@ import { SearchEngineService } from '../search-engine.service';
 export class TypesenseService extends SearchEngineService {
   constructor(@Inject('Typesense') private client: Client) {
     super();
-    this.engineName = 'Typesense';
+    this.engineName = 'typesense';
   }
 
   protected override async createCollection(collectionName: string, data: any) {
@@ -55,8 +55,24 @@ export class TypesenseService extends SearchEngineService {
 
   public async keywordbla(collectionName: string, keyword: string) {
     const keys = this.getAllKeys(collectionName);
-    const formatetKeys = this.formatFields(keys);
+    const formatetKeys = this.stringifyFields(keys);
     const searchParams = { q: keyword, query_by: formatetKeys };
+    console.log('query: ', searchParams);
+    await this.client
+      .collections(collectionName)
+      .documents()
+      .search(searchParams)
+      .then(function (searchResults) {
+        console.log(JSON.stringify(searchResults, null, 2));
+      });
+  }
+
+  protected override async placeholderQuery(
+    collectionName: string,
+    fields: string[],
+  ) {
+    const query_by: string = this.stringifyFields(fields);
+    const searchParams = { q: '', query_by: query_by };
     console.log('query: ', searchParams);
     await this.client
       .collections(collectionName)
@@ -72,7 +88,7 @@ export class TypesenseService extends SearchEngineService {
     keyword: string,
     fields: string[],
   ) {
-    const query_by: string = this.formatFields(fields);
+    const query_by: string = this.stringifyFields(fields);
     const searchParams = { q: keyword, query_by: query_by };
     console.log('query: ', searchParams);
     await this.client
@@ -82,14 +98,5 @@ export class TypesenseService extends SearchEngineService {
       .then(function (searchResults) {
         console.log(JSON.stringify(searchResults, null, 2));
       });
-  }
-
-  private formatFields(fields: string[]): string {
-    let res = fields[0];
-    for (let i = 1; i < fields.length; i++) {
-      res += ', ';
-      res += fields[i];
-    }
-    return res;
   }
 }

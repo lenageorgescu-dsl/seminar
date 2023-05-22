@@ -49,12 +49,4 @@ export class SearchController {
   search() {
     return this.searchService.searchData();
   }
-
-  // @Get('typesense/:collection/:keyword')
-  // async searchTypeSense(@Param() params: any) {
-  //   return await this.searchService.searchTypeSense(
-  //     params.collection,
-  //     params.keyword,
-  //   );
-  // }
 }

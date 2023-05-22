@@ -12,7 +12,8 @@ export class SearchService {
   ) {}
 
   public async searchData() {
-    await this.typesense.keywordbla('tweets', 'dark');
+    //await this.typesense.keywordbla('tweets', 'dark');
+    await this.typesense.placeholderSearch('test', ['authors']);
     console.log('foo');
   }
 

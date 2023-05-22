@@ -13,7 +13,7 @@ interface Document {
 export class ElasticService extends SearchEngineService {
   constructor(@Inject('ElasticSearch') private client: Client) {
     super();
-    this.engineName = 'Elastic';
+    this.engineName = 'elastic';
   }
 
   protected async createCollection(collectionName: string, data: any) {
