@@ -15,19 +15,16 @@ export class IndexingService {
   public async indexTypeSense(collectionName: string) {
     const data = this.loadData(`../app/assets/data/${collectionName}.json`);
     await this.typesense.indexDocuments(collectionName, data);
-    console.log('Typensense index finished: ', collectionName);
   }
 
   public async indexMeili(collectionName: string) {
     const data = this.loadData(`../app/assets/data/${collectionName}.json`);
     await this.meili.indexDocuments(collectionName, data);
-    console.log('Meili index finished: ', collectionName);
   }
 
   public async indexElastic(collectionName: string) {
     const data = this.loadData(`../app/assets/data/${collectionName}.json`);
     await this.elastic.indexDocuments(collectionName, data);
-    console.log('Elastic index finished: ', collectionName);
   }
 
   private loadData(path: string) {
