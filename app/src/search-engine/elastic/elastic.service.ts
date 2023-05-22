@@ -36,20 +36,6 @@ export class ElasticService extends SearchEngineService {
       .then((res) => console.log(res));
   }
 
-  // async searchCollection(collectionName: string, query: string) {
-  //   await this.client.indices.refresh({ index: collectionName });
-
-  //   // Let's search!
-  //   const result = await this.client.search<Document>({
-  //     index: collectionName,
-  //     query: {
-  //       match: { text: query },
-  //     },
-  //   });
-
-  //   console.log(result.hits.hits);
-  // }
-
   protected override async placeholderQuery(collectionName: string) {
     await this.client.indices.refresh({ index: collectionName });
     const result = await this.client.search<Document>({
@@ -58,7 +44,8 @@ export class ElasticService extends SearchEngineService {
         match_all: {},
       },
     });
-    console.log(JSON.stringify(result.hits.hits, null, 2));
+    //console.log(JSON.stringify(result.hits.hits.length, null, 2));
+    return result.hits.hits.length;
   }
 
   protected override async multiMatchQuery(
@@ -73,6 +60,7 @@ export class ElasticService extends SearchEngineService {
         multi_match: { query: keyword, fields: fields },
       },
     });
-    console.log(result.hits.hits);
+    //console.log(result.hits.hits);
+    return result.hits.hits.length;
   }
 }

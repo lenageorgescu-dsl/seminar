@@ -11,7 +11,6 @@ export abstract class SearchEngineService {
     try {
       const startTime = Date.now();
       await this.createCollection(collectionName, data);
-      console.log('engine name : ' + this.engineName);
       const containerData = await this.getContainerData(this.engineName);
       const endTime = Date.now();
       const res = JSON.stringify({
@@ -24,6 +23,8 @@ export abstract class SearchEngineService {
         memPercent: containerData.memPercent,
         cpuPercent: containerData.cpuPercent,
       });
+      console.log('INDEX: ');
+      console.log(res);
       writeFileSync(
         `${this.engineName}-${collectionName}-index-${this.experimentNumber}.txt`,
         res,
@@ -58,7 +59,6 @@ export abstract class SearchEngineService {
     try {
       const startTime = Date.now();
       const hits = await this.multiMatchQuery(collectionName, keyword, fields);
-      console.log(hits);
       const containerData = await this.getContainerData(this.engineName);
       const endTime = Date.now();
       const data = JSON.stringify({
@@ -73,6 +73,8 @@ export abstract class SearchEngineService {
         memPercent: containerData.memPercent,
         cpuPercent: containerData.cpuPercent,
       });
+      console.log('KEYWORDSEARCH: ');
+      console.log(data);
       writeFileSync(
         `${this.engineName}-keywordSearch-${collectionName}-${keyword}.txt`,
         data,
@@ -86,12 +88,11 @@ export abstract class SearchEngineService {
     try {
       const startTime = Date.now();
       const hits = await this.placeholderQuery(collectionName);
-      console.log('hits: ', hits);
       const containerData = await this.getContainerData(this.engineName);
       const endTime = Date.now();
       const data = JSON.stringify({
         engine: this.engineName,
-        operation: 'keywordSearch',
+        operation: 'placeholderSearch',
         collection: collectionName,
         hits: hits,
         startTime,
@@ -100,6 +101,8 @@ export abstract class SearchEngineService {
         memPercent: containerData.memPercent,
         cpuPercent: containerData.cpuPercent,
       });
+      console.log('PLACEHOLDERSEARCH: ');
+      console.log(data);
       writeFileSync(
         `${this.engineName}-placeholderSearch-${collectionName}.txt`,
         data,

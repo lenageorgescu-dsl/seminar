@@ -13,10 +13,6 @@ export class SearchService {
 
   public async searchData() {
     //await this.typesense.keywordbla('tweets', 'dark');
-    await this.typesense.placeholderSearch('test');
+    await this.elastic.placeholderSearch('test');
   }
-
-  // public async searchTypeSense(collectionName: string, keyword: string) {
-  //   await this.typesense.searchCollection(collectionName, keyword);
-  // }
 }
