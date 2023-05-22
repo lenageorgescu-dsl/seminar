@@ -16,6 +16,7 @@ import MeiliSearch from 'meilisearch';
 import { Client as ElastiClient } from '@elastic/elasticsearch';
 import { SearchService } from './search/search.service';
 import { ExperimentService } from './experiment/experiment.service';
+import { SearchEngineService } from './search-engine/search-engine.service';
 
 const typeSenseProvider: Provider = {
   provide: 'Typesense',

@@ -15,6 +15,7 @@ export abstract class SearchEngineService {
       const containerData = await this.getContainerData(this.engineName);
       const endTime = Date.now();
       const res = JSON.stringify({
+        experiment: this.experimentNumber,
         engine: this.engineName,
         operation: 'index',
         collection: collectionName,
@@ -27,7 +28,7 @@ export abstract class SearchEngineService {
       console.log('INDEX: ');
       console.log(res);
       writeFileSync(
-        `${this.engineName}-${collectionName}-index-${this.experimentNumber}.txt`,
+        `${this.experimentNumber}-${this.engineName}-index-${collectionName}-.txt`,
         res,
       );
     } catch (e) {
@@ -63,6 +64,7 @@ export abstract class SearchEngineService {
       const containerData = await this.getContainerData(this.engineName);
       const endTime = Date.now();
       const data = JSON.stringify({
+        experiment: this.experimentNumber,
         engine: this.engineName,
         operation: 'keywordSearch',
         collection: collectionName,
@@ -77,7 +79,7 @@ export abstract class SearchEngineService {
       console.log('KEYWORDSEARCH: ');
       console.log(data);
       writeFileSync(
-        `${this.engineName}-keywordSearch-${collectionName}-${keyword}.txt`,
+        `${this.experimentNumber}-${this.engineName}-keywordSearch-${collectionName}-${keyword}.txt`,
         data,
       );
     } catch (e) {
@@ -92,6 +94,7 @@ export abstract class SearchEngineService {
       const containerData = await this.getContainerData(this.engineName);
       const endTime = Date.now();
       const data = JSON.stringify({
+        experiment: this.experimentNumber,
         engine: this.engineName,
         operation: 'placeholderSearch',
         collection: collectionName,
@@ -105,7 +108,7 @@ export abstract class SearchEngineService {
       console.log('PLACEHOLDERSEARCH: ');
       console.log(data);
       writeFileSync(
-        `${this.engineName}-placeholderSearch-${collectionName}.txt`,
+        `${this.experimentNumber}-${this.engineName}-placeholderSearch-${collectionName}.txt`,
         data,
       );
     } catch (e) {
@@ -146,5 +149,9 @@ export abstract class SearchEngineService {
     const file = readFileSync(path, 'utf-8');
     const data = JSON.parse(file);
     return data;
+  }
+
+  public setVersion(version: number) {
+    this.experimentNumber = version;
   }
 }
