@@ -1,6 +1,5 @@
 import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { HealthService } from './health/health.service';
-import { SearchEngineService } from '../search-engine/search-engine.service';
 import { MeiliService } from '../search-engine/meili/meili.service';
 import { ElasticService } from '../search-engine/elastic/elastic.service';
 import { TypesenseService } from '../search-engine/typesense/typesense.service';

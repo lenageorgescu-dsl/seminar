@@ -46,6 +46,14 @@ export class IndexController {
     await this.elastic.indexDocuments(name);
     return 'Index Elastic Controller finished';
   }
+
+  @Get('all/:collectionName')
+  async indexAll(@Param('collectionName') name: string): Promise<string> {
+    await this.typesense.indexDocuments(name);
+    await this.meili.indexDocuments(name);
+    await this.elastic.indexDocuments(name);
+    return 'All engines finished indexing ';
+  }
 }
 
 @Controller('search')

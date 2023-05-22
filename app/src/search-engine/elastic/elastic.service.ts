@@ -22,7 +22,6 @@ export class ElasticService extends SearchEngineService {
       throw new Error(
         'Collection ' + collectionName + ' already exists in Elastic',
       );
-    console.log('exist result: ', res);
 
     await this.client.helpers
       .bulk({
