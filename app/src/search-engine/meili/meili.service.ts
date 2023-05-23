@@ -14,7 +14,6 @@ export class MeiliService extends SearchEngineService {
   protected override async createCollection(collectionName: string, data: any) {
     const res = (await this.client.getTasks({ indexUids: [collectionName] }))
       .results;
-    console.log(res);
     if (res.length > 0 && !this.allTasksFailed(res)) {
       //if task already exists and those tasks haven't all failed, don't create new task
       throw new Error(
@@ -35,17 +34,15 @@ export class MeiliService extends SearchEngineService {
     const res = await this.client.index(collectionName).search(keyword, {
       attributesToRetrieve: fields,
     });
-    return (res as undefined as any).nbHits;
+    return res.estimatedTotalHits;
   }
 
   protected override async placeholderQuery(collectionName: string) {
     const res = await this.client.index(collectionName).search();
-    console.log(res.estimatedTotalHits);
     return res.estimatedTotalHits;
   }
 
   private async checkStatus(taskId: number) {
-    console.log(taskId);
     return new Promise<void>(async (resolve, reject) => {
       const id = setIntervalAsync(async () => {
         const status = (await this.client.getTask(taskId)).status;
