@@ -2,10 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { dockerContainers, dockerContainerStats } from 'dockerstats';
 import { readFileSync, writeFileSync } from 'fs';
 
+export type BoolQuery = {
+  and: string[];
+  or: string[];
+};
+
 @Injectable()
 export abstract class SearchEngineService {
   protected engineName: string;
   protected experimentNumber = 42;
+  private resultPath = `results/${this.experimentNumber}`;
 
   public async indexDocuments(collectionName: string) {
     try {
@@ -27,10 +33,7 @@ export abstract class SearchEngineService {
       });
       console.log('INDEX: ');
       console.log(res);
-      writeFileSync(
-        `results/${this.experimentNumber}-${this.engineName}-index-${collectionName}-.txt`,
-        res,
-      );
+      writeFileSync(`results/${this.experimentNumber}`, res, { flag: 'a' });
     } catch (e) {
       console.log(e);
     }
@@ -69,6 +72,7 @@ export abstract class SearchEngineService {
         operation: 'keywordSearch',
         collection: collectionName,
         keyword: keyword,
+        fields: fields,
         hits: hits,
         startTime,
         endTime,
@@ -78,13 +82,45 @@ export abstract class SearchEngineService {
       });
       console.log('KEYWORDSEARCH: ');
       console.log(data);
-      writeFileSync(
-        `results/${this.experimentNumber}-${this.engineName}-keywordSearch-${collectionName}-${keyword}.txt`,
-        data,
-      );
+      writeFileSync(`results/${this.experimentNumber}`, data, { flag: 'a' });
     } catch (e) {
       console.log(e);
     }
+  }
+
+  public async boolQuerySearch(collectionName: string, query: BoolQuery) {
+    try {
+      const startTime = Date.now();
+      const hits = await this.boolQuery(collectionName, query);
+      const containerData = await this.getContainerData(this.engineName);
+      const endTime = Date.now();
+      const data = JSON.stringify({
+        experiment: this.experimentNumber,
+        engine: this.engineName,
+        operation: 'placeholderSearch',
+        collection: collectionName,
+        boolQuery: query,
+        hits: hits,
+        startTime,
+        endTime,
+        running: endTime - startTime,
+        memPercent: containerData.memPercent,
+        cpuPercent: containerData.cpuPercent,
+      });
+      console.log('KEYWORDSEARCH: ');
+      console.log(data);
+      writeFileSync(`results/${this.experimentNumber}`, data, { flag: 'a' });
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  protected boolQuery(collectionName: string, query: BoolQuery) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve('boolQuery');
+      }, 5000);
+    });
   }
 
   public async placeholderSearch(collectionName: string) {
@@ -107,10 +143,7 @@ export abstract class SearchEngineService {
       });
       console.log('PLACEHOLDERSEARCH: ');
       console.log(data);
-      writeFileSync(
-        `results/${this.experimentNumber}-${this.engineName}-placeholderSearch-${collectionName}.txt`,
-        data,
-      );
+      writeFileSync(`results/${this.experimentNumber}`, data, { flag: 'a' });
     } catch (e) {
       console.log(e);
     }
