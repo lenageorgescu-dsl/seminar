@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { dockerContainers, dockerContainerStats } from 'dockerstats';
 import { readFileSync, writeFileSync } from 'fs';
+import { ExperimentService } from '../experiment/experiment.service';
 
 export type BoolQuery = {
   and: string[];
@@ -11,7 +12,7 @@ export type BoolQuery = {
 export abstract class SearchEngineService {
   protected engineName: string;
   protected experimentNumber = 42;
-  private resultPath = `results/${this.experimentNumber}`;
+  protected path = 'foobar';
 
   public async indexDocuments(collectionName: string) {
     try {
@@ -33,7 +34,7 @@ export abstract class SearchEngineService {
       });
       console.log('INDEX: ');
       console.log(res);
-      writeFileSync(`results/${this.experimentNumber}`, res, { flag: 'a' });
+      writeFileSync(this.path, res, { flag: 'a' });
     } catch (e) {
       console.log(e);
     }
@@ -82,7 +83,7 @@ export abstract class SearchEngineService {
       });
       console.log('KEYWORDSEARCH: ');
       console.log(data);
-      writeFileSync(`results/${this.experimentNumber}`, data, { flag: 'a' });
+      writeFileSync(this.path, data, { flag: 'a' });
     } catch (e) {
       console.log(e);
     }
@@ -109,7 +110,7 @@ export abstract class SearchEngineService {
       });
       console.log('KEYWORDSEARCH: ');
       console.log(data);
-      writeFileSync(`results/${this.experimentNumber}`, data, { flag: 'a' });
+      writeFileSync(this.path, data, { flag: 'a' });
     } catch (e) {
       console.log(e);
     }
@@ -143,7 +144,7 @@ export abstract class SearchEngineService {
       });
       console.log('PLACEHOLDERSEARCH: ');
       console.log(data);
-      writeFileSync(`results/${this.experimentNumber}`, data, { flag: 'a' });
+      writeFileSync(this.path, data, { flag: 'a' });
     } catch (e) {
       console.log(e);
     }
@@ -186,5 +187,9 @@ export abstract class SearchEngineService {
 
   public setVersion(version: number) {
     this.experimentNumber = version;
+  }
+
+  public setPath() {
+    this.path = `${ExperimentService.getResultPath()}${this.experimentNumber}`;
   }
 }

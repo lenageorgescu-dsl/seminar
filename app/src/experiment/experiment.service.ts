@@ -3,10 +3,11 @@ import { HealthService } from './health/health.service';
 import { MeiliService } from '../search-engine/meili/meili.service';
 import { ElasticService } from '../search-engine/elastic/elastic.service';
 import { TypesenseService } from '../search-engine/typesense/typesense.service';
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync, unlink, writeFileSync } from 'fs';
 
 @Injectable()
 export class ExperimentService implements OnApplicationBootstrap {
+  private static resultPath = 'results/';
   constructor(
     private healthService: HealthService,
     private meili: MeiliService,
@@ -18,13 +19,14 @@ export class ExperimentService implements OnApplicationBootstrap {
   }
 
   public async runExperiment(version: number) {
-    await this.setVersion(version);
+    this.setVersion(version);
+    this.setResultPath();
     await this.indexAll('tweets');
     await this.indexAll('articles');
 
     await this.placeholderSearchAll('articles');
     await this.placeholderSearchAll('tweets');
-    this.parseResults(version);
+    await this.parseResults(version);
   }
 
   private async indexAll(collectionName: string) {
@@ -55,19 +57,43 @@ export class ExperimentService implements OnApplicationBootstrap {
     this.typesense.setVersion(version);
   }
 
-  private parseResults(version: number) {
-    let data = readFileSync(`results/${version}`, 'utf-8');
+  private setResultPath() {
+    this.meili.setPath();
+    this.typesense.setPath();
+    this.elastic.setPath();
+  }
+
+  private async parseResults(version: number) {
+    let data = readFileSync(
+      `${ExperimentService.getResultPath()}${version}`,
+      'utf-8',
+    );
     data = '[' + data + ']';
     data = data.replaceAll('}{', '},{');
-    writeFileSync(`results/${version}_experiment.json`, data);
+    writeFileSync(
+      `${ExperimentService.getResultPath()}${version}_experiment.json`,
+      data,
+    );
+    unlink(`${ExperimentService.getResultPath()}${version}`, (err) => {
+      console.log(err);
+    });
   }
 
   public compileResults(from: number, to: number) {
     const data: Array<string> = [];
     for (let i = from; i <= to; i++) {
-      const res = JSON.parse(readFileSync(`results/${i}_experiment`, 'utf-8'));
+      const res = JSON.parse(
+        readFileSync(
+          `${ExperimentService.getResultPath()}${i}_experiment`,
+          'utf-8',
+        ),
+      );
       data.push(res);
     }
     //TODO: compute median
+  }
+
+  public static getResultPath(): string {
+    return this.resultPath;
   }
 }
