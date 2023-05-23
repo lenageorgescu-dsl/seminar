@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { dockerContainers, dockerContainerStats } from 'dockerstats';
 import { readFileSync, writeFileSync } from 'fs';
 import { ExperimentService } from '../experiment/experiment.service';
-import { cpus } from 'os';
+import { promisify } from 'util';
 
 export type BoolQuery = {
   and: string[];
@@ -20,15 +20,20 @@ export abstract class SearchEngineService {
       const data = this.loadData(`../app/assets/data/${collectionName}.json`);
       const cpuStats: Array<number> = [];
       const memStats: Array<number> = [];
+      const containerData = await this.getContainerData(this.engineName);
+      cpuStats.push(containerData.cpuPercent);
+      memStats.push(containerData.memPercent);
       const intervalId = setInterval(async () => {
         const data = await this.getContainerData(this.engineName);
         cpuStats.push(data.cpuPercent);
         memStats.push(data.memPercent);
-      }, 1000);
+      }, 500);
+      const storageBefore = await this.getStorage();
       const startTime = Date.now();
       await this.createCollection(collectionName, data);
       const endTime = Date.now();
       clearInterval(intervalId);
+      const storageAfter = await this.getStorage();
       const res = JSON.stringify({
         experiment: this.experimentNumber,
         engine: this.engineName,
@@ -39,6 +44,7 @@ export abstract class SearchEngineService {
         running: endTime - startTime,
         memPercent: memStats,
         cpuPercent: cpuStats,
+        storageMega: storageAfter - storageBefore,
       });
       console.log('INDEX: ');
       console.log(res);
@@ -46,6 +52,24 @@ export abstract class SearchEngineService {
     } catch (e) {
       console.log(e);
     }
+  }
+
+  private async getStorage() {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const exec = promisify(require('node:child_process').exec);
+    const { stdout } = await exec('du -h --max-depth=1', {
+      cwd: '../search-engine-volumes',
+    });
+    const arr: string[] = stdout.split(/\r?\n/);
+    const str = arr
+      .filter((element) => element.includes(this.engineName))
+      .pop();
+    const amount = str.split('./')[0];
+    let firstPart = ~~amount.slice(0, amount.length - 2);
+    const secondPart = amount.slice(amount.length - 2);
+    if (secondPart.includes('K')) firstPart /= 1000;
+    if (secondPart.includes('G')) firstPart *= 1000;
+    return firstPart;
   }
 
   protected createCollection(collectionName: string, data: any) {
@@ -77,7 +101,7 @@ export abstract class SearchEngineService {
         const data = await this.getContainerData(this.engineName);
         cpuStats.push(data.cpuPercent);
         memStats.push(data.memPercent);
-      }, 1000);
+      }, 5);
       const startTime = Date.now();
       const hits = await this.multiMatchQuery(collectionName, keyword, fields);
       const endTime = Date.now();
@@ -112,7 +136,7 @@ export abstract class SearchEngineService {
         const data = await this.getContainerData(this.engineName);
         cpuStats.push(data.cpuPercent);
         memStats.push(data.memPercent);
-      }, 1000);
+      }, 5);
       const startTime = Date.now();
       const hits = await this.boolQuery(collectionName, query);
       const endTime = Date.now();
@@ -154,7 +178,7 @@ export abstract class SearchEngineService {
         const data = await this.getContainerData(this.engineName);
         cpuStats.push(data.cpuPercent);
         memStats.push(data.memPercent);
-      }, 1000);
+      }, 1);
 
       const startTime = Date.now();
       const hits = await this.placeholderQuery(collectionName);
