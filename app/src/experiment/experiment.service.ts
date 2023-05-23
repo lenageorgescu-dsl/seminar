@@ -7,7 +7,7 @@ import { readFileSync, unlink, writeFileSync } from 'fs';
 
 @Injectable()
 export class ExperimentService implements OnApplicationBootstrap {
-  private static resultPath = 'results/';
+  private static resultPath = '../charts/src/assets/';
   constructor(
     private healthService: HealthService,
     private meili: MeiliService,
@@ -75,7 +75,7 @@ export class ExperimentService implements OnApplicationBootstrap {
       data,
     );
     unlink(`${ExperimentService.getResultPath()}${version}`, (err) => {
-      console.log(err);
+      console.log();
     });
   }
 
