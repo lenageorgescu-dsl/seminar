@@ -1,7 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import MeiliSearch, { Task } from 'meilisearch';
-import { SearchEngineService } from '../search-engine.service';
+import { BoolQuery, SearchEngineService } from '../search-engine.service';
 import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async';
+import Tasks from '@elastic/elasticsearch/lib/api/api/tasks';
 
 @Injectable()
 export class MeiliService extends SearchEngineService {
@@ -11,27 +12,19 @@ export class MeiliService extends SearchEngineService {
   }
 
   protected override async createCollection(collectionName: string, data: any) {
-    console.log('collectionName: ', collectionName);
-    const res = (await this.client.getTasks({ indexUids: [] })).results.filter(
-      (task) => task.indexUid == collectionName,
-    ); //getTasks({indexUids: ['xy']}) doesn't work
-    console.log('Tasks first: ', res);
+    const res = (await this.client.getTasks({ indexUids: [collectionName] }))
+      .results;
+    console.log(res);
     if (res.length > 0 && !this.allTasksFailed(res)) {
       //if task already exists and those tasks haven't all failed, don't create new task
       throw new Error(
         'Task ' + collectionName + ' already exists, will not be indexed again',
       );
     }
-    await this.client
+    const enquededTask = await this.client
       .index(collectionName)
-      .addDocuments(data)
-      .then((res) => {
-        console.log(res);
-      });
-    const id = (await this.client.getTasks({ indexUids: [] })).results
-      .filter((task) => task.indexUid == collectionName)
-      .pop().uid; //getTasks({indexUids: ['xy']}) doesn't work
-    await this.checkStatus(id);
+      .addDocuments(data);
+    await this.checkStatus(enquededTask.taskUid);
   }
 
   protected override async multiMatchQuery(
@@ -47,30 +40,52 @@ export class MeiliService extends SearchEngineService {
 
   protected override async placeholderQuery(collectionName: string) {
     const res = await this.client.index(collectionName).search();
-    return (res as undefined as any).nbHits;
+    console.log(res.estimatedTotalHits);
+    return res.estimatedTotalHits;
   }
 
   private async checkStatus(taskId: number) {
     console.log(taskId);
     return new Promise<void>(async (resolve, reject) => {
       const id = setIntervalAsync(async () => {
-        const res = await this.fetchStatus(taskId);
-        if (res == true) {
+        const status = (await this.client.getTask(taskId)).status;
+        console.log('Proccessing task ', taskId);
+        if (status == 'succeeded') {
           clearIntervalAsync(id);
           resolve();
         }
+        if (status == 'failed')
+          throw new Error('indexing meili collection failed: taskId ' + taskId);
       }, 1000);
     });
   }
 
-  private async fetchStatus(id: number) {
-    const status = (await this.client.getTask(id)).status;
-    console.log('taskId: ', id);
-    console.log(status);
-    if (status == 'succeeded') return true;
-    if (status == 'failed')
-      throw new Error('indexing meili collection failed: taskId ' + id);
-    return false;
+  private arrayUnique(arr) {
+    const a = arr.concat();
+    for (let i = 0; i < a.length; ++i) {
+      for (let j = i + 1; j < a.length; ++j) {
+        if (a[i] === a[j]) a.splice(j--, 1);
+      }
+    }
+
+    return a;
+  }
+
+  protected override async boolQuery(collectionName: string, query: BoolQuery) {
+    console.log(collectionName);
+    const fields = this.arrayUnique(query.and.concat(query.or));
+    //await this.client.index(collectionName).updateFilterableAttributes(fields);
+    const res = await this.client
+      .index(collectionName)
+      .updateFilterableAttributes(['title'])
+      .catch((e) => {
+        console.log(e);
+      });
+    console.log(res);
+    // this.client
+    //   .index(collectionName)
+    //   .search('title = the AND authors = Rowling')
+    //   .then((res) => { private async fetchStatus(id: number) {
   }
 
   private allTasksFailed(arr: Task[]): boolean {

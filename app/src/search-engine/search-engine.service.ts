@@ -154,7 +154,7 @@ export abstract class SearchEngineService {
         memPercent: memStats,
         cpuPercent: cpuStats,
       });
-      console.log('KEYWORDSEARCH: ');
+      console.log('FACETED SEARCH: ');
       console.log(data);
       writeFileSync(this.path, data, { flag: 'a' });
     } catch (e) {

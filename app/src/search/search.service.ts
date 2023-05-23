@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { TypesenseService } from '../search-engine/typesense/typesense.service';
 import { ElasticService } from '../search-engine/elastic/elastic.service';
 import { MeiliService } from '../search-engine/meili/meili.service';
+import Collection from 'typesense/lib/Typesense/Collection';
 
 @Injectable()
 export class SearchService {
@@ -13,7 +14,7 @@ export class SearchService {
 
   public async searchData() {
     //await this.typesense.keywordbla('tweets', 'dark');
-    await this.typesense.placeholderSearch('test');
-    await this.typesense.placeholderSearch('articles');
+    //await this.typesense.placeholderSearch('test');
+    await this.meili.placeholderSearch('tweets');
   }
 }
