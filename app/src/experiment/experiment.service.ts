@@ -61,4 +61,13 @@ export class ExperimentService implements OnApplicationBootstrap {
     data = data.replaceAll('}{', '},{');
     writeFileSync(`results/${version}_experiment.json`, data);
   }
+
+  public compileResults(from: number, to: number) {
+    const data: Array<string> = [];
+    for (let i = from; i <= to; i++) {
+      const res = JSON.parse(readFileSync(`results/${i}_experiment`, 'utf-8'));
+      data.push(res);
+    }
+    //TODO: compute median
+  }
 }

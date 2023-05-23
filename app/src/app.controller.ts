@@ -75,4 +75,10 @@ export class ExperimentController {
     await this.experiment.runExperiment(version);
     return 'Experiment Controller finished';
   }
+
+  @Get(':from/:to')
+  compileResults(@Param('from') from: number, @Param('to') to: number) {
+    this.experiment.compileResults(from, to);
+    return 'Compiling results finished';
+  }
 }
