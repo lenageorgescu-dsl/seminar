@@ -17,12 +17,39 @@ export class ExperimentService implements OnApplicationBootstrap {
   }
 
   async runExperiment(version: number) {
-    console.log('running experiment');
+    await this.setVersion(version);
+    await this.indexAll('articles');
+    await this.indexAll('tweets');
+
+    await this.placeholderSearchAll('articles');
+    await this.placeholderSearchAll('tweets');
+  }
+
+  private async indexAll(collectionName: string) {
+    await this.typesense.indexDocuments(collectionName);
+    await this.meili.indexDocuments(collectionName);
+    await this.elastic.indexDocuments(collectionName);
+  }
+
+  private async keywordSearchAll(
+    collectionName: string,
+    keyword: string,
+    fields: string[],
+  ) {
+    await this.typesense.keywordSearch(collectionName, keyword, fields);
+    await this.meili.keywordSearch(collectionName, keyword, fields);
+    await this.elastic.keywordSearch(collectionName, keyword, fields);
+  }
+
+  private async placeholderSearchAll(collectionName: string) {
+    await this.typesense.placeholderSearch(collectionName);
+    await this.meili.placeholderSearch(collectionName);
+    await this.elastic.placeholderSearch(collectionName);
+  }
+
+  private setVersion(version: number) {
     this.meili.setVersion(version);
     this.elastic.setVersion(version);
     this.typesense.setVersion(version);
-    await this.meili.placeholderSearch('test');
-    await this.elastic.placeholderSearch('test');
-    await this.typesense.placeholderSearch('test');
   }
 }

@@ -28,7 +28,7 @@ export abstract class SearchEngineService {
       console.log('INDEX: ');
       console.log(res);
       writeFileSync(
-        `${this.experimentNumber}-${this.engineName}-index-${collectionName}-.txt`,
+        `results/${this.experimentNumber}-${this.engineName}-index-${collectionName}-.txt`,
         res,
       );
     } catch (e) {
@@ -79,7 +79,7 @@ export abstract class SearchEngineService {
       console.log('KEYWORDSEARCH: ');
       console.log(data);
       writeFileSync(
-        `${this.experimentNumber}-${this.engineName}-keywordSearch-${collectionName}-${keyword}.txt`,
+        `results/${this.experimentNumber}-${this.engineName}-keywordSearch-${collectionName}-${keyword}.txt`,
         data,
       );
     } catch (e) {
@@ -108,7 +108,7 @@ export abstract class SearchEngineService {
       console.log('PLACEHOLDERSEARCH: ');
       console.log(data);
       writeFileSync(
-        `${this.experimentNumber}-${this.engineName}-placeholderSearch-${collectionName}.txt`,
+        `results/${this.experimentNumber}-${this.engineName}-placeholderSearch-${collectionName}.txt`,
         data,
       );
     } catch (e) {
