@@ -3,6 +3,7 @@ import { Client } from '@elastic/elasticsearch';
 import { estypes } from '@elastic/elasticsearch';
 import { estypesWithBody } from '@elastic/elasticsearch';
 import { SearchEngineService } from '../search-engine.service';
+import { writeFileSync } from 'fs';
 
 interface Document {
   character: string;
@@ -43,8 +44,7 @@ export class ElasticService extends SearchEngineService {
         match_all: {},
       },
     });
-    //console.log(JSON.stringify(result.hits.hits.length, null, 2));
-    return result.hits.hits.length;
+    return (result as undefined as any).hits.total.value;
   }
 
   protected override async multiMatchQuery(
@@ -59,7 +59,6 @@ export class ElasticService extends SearchEngineService {
         multi_match: { query: keyword, fields: fields },
       },
     });
-    //console.log(result.hits.hits);
-    return result.hits.hits.length;
+    return (result as undefined as any).hits.total.value;
   }
 }
