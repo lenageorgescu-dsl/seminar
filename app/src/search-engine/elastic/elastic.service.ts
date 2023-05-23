@@ -3,7 +3,6 @@ import { Client } from '@elastic/elasticsearch';
 import { estypes } from '@elastic/elasticsearch';
 import { estypesWithBody } from '@elastic/elasticsearch';
 import { SearchEngineService } from '../search-engine.service';
-import { writeFileSync } from 'fs';
 
 interface Document {
   character: string;

@@ -2,7 +2,6 @@ import { Inject, Injectable } from '@nestjs/common';
 import MeiliSearch, { Task } from 'meilisearch';
 import { SearchEngineService } from '../search-engine.service';
 import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async';
-import { writeFileSync } from 'fs';
 
 @Injectable()
 export class MeiliService extends SearchEngineService {

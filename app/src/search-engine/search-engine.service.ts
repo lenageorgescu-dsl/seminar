@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { dockerContainers, dockerContainerStats } from 'dockerstats';
 import { readFileSync, writeFileSync } from 'fs';
 import { ExperimentService } from '../experiment/experiment.service';
+import { cpus } from 'os';
 
 export type BoolQuery = {
   and: string[];
@@ -17,10 +18,17 @@ export abstract class SearchEngineService {
   public async indexDocuments(collectionName: string) {
     try {
       const data = this.loadData(`../app/assets/data/${collectionName}.json`);
+      const cpuStats: Array<number> = [];
+      const memStats: Array<number> = [];
+      const intervalId = setInterval(async () => {
+        const data = await this.getContainerData(this.engineName);
+        cpuStats.push(data.cpuPercent);
+        memStats.push(data.memPercent);
+      }, 1000);
       const startTime = Date.now();
       await this.createCollection(collectionName, data);
-      const containerData = await this.getContainerData(this.engineName);
       const endTime = Date.now();
+      clearInterval(intervalId);
       const res = JSON.stringify({
         experiment: this.experimentNumber,
         engine: this.engineName,
@@ -29,8 +37,8 @@ export abstract class SearchEngineService {
         startTime,
         endTime,
         running: endTime - startTime,
-        memPercent: containerData.memPercent,
-        cpuPercent: containerData.cpuPercent,
+        memPercent: memStats,
+        cpuPercent: cpuStats,
       });
       console.log('INDEX: ');
       console.log(res);
@@ -63,10 +71,17 @@ export abstract class SearchEngineService {
     fields: string[],
   ) {
     try {
+      const cpuStats: Array<number> = [];
+      const memStats: Array<number> = [];
+      const intervalId = setInterval(async () => {
+        const data = await this.getContainerData(this.engineName);
+        cpuStats.push(data.cpuPercent);
+        memStats.push(data.memPercent);
+      }, 1000);
       const startTime = Date.now();
       const hits = await this.multiMatchQuery(collectionName, keyword, fields);
-      const containerData = await this.getContainerData(this.engineName);
       const endTime = Date.now();
+      clearInterval(intervalId);
       const data = JSON.stringify({
         experiment: this.experimentNumber,
         engine: this.engineName,
@@ -78,8 +93,8 @@ export abstract class SearchEngineService {
         startTime,
         endTime,
         running: endTime - startTime,
-        memPercent: containerData.memPercent,
-        cpuPercent: containerData.cpuPercent,
+        memPercent: memStats,
+        cpuPercent: cpuStats,
       });
       console.log('KEYWORDSEARCH: ');
       console.log(data);
@@ -91,10 +106,17 @@ export abstract class SearchEngineService {
 
   public async boolQuerySearch(collectionName: string, query: BoolQuery) {
     try {
+      const cpuStats: Array<number> = [];
+      const memStats: Array<number> = [];
+      const intervalId = setInterval(async () => {
+        const data = await this.getContainerData(this.engineName);
+        cpuStats.push(data.cpuPercent);
+        memStats.push(data.memPercent);
+      }, 1000);
       const startTime = Date.now();
       const hits = await this.boolQuery(collectionName, query);
-      const containerData = await this.getContainerData(this.engineName);
       const endTime = Date.now();
+      clearInterval(intervalId);
       const data = JSON.stringify({
         experiment: this.experimentNumber,
         engine: this.engineName,
@@ -105,8 +127,8 @@ export abstract class SearchEngineService {
         startTime,
         endTime,
         running: endTime - startTime,
-        memPercent: containerData.memPercent,
-        cpuPercent: containerData.cpuPercent,
+        memPercent: memStats,
+        cpuPercent: cpuStats,
       });
       console.log('KEYWORDSEARCH: ');
       console.log(data);
@@ -126,10 +148,18 @@ export abstract class SearchEngineService {
 
   public async placeholderSearch(collectionName: string) {
     try {
+      const cpuStats: Array<number> = [];
+      const memStats: Array<number> = [];
+      const intervalId = setInterval(async () => {
+        const data = await this.getContainerData(this.engineName);
+        cpuStats.push(data.cpuPercent);
+        memStats.push(data.memPercent);
+      }, 1000);
+
       const startTime = Date.now();
       const hits = await this.placeholderQuery(collectionName);
-      const containerData = await this.getContainerData(this.engineName);
       const endTime = Date.now();
+      clearInterval(intervalId);
       const data = JSON.stringify({
         experiment: this.experimentNumber,
         engine: this.engineName,
@@ -139,8 +169,8 @@ export abstract class SearchEngineService {
         startTime,
         endTime,
         running: endTime - startTime,
-        memPercent: containerData.memPercent,
-        cpuPercent: containerData.cpuPercent,
+        memPercent: memStats,
+        cpuPercent: cpuStats,
       });
       console.log('PLACEHOLDERSEARCH: ');
       console.log(data);
