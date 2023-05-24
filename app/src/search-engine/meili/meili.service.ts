@@ -67,7 +67,7 @@ export class MeiliService extends SearchEngineService {
     query: BoolQuery,
   ) {
     await this.reindex(collectionName, query);
-    const newQuery = this.stringifyBoolQuery(query, 'AND', 'OR', '=');
+    const newQuery = this.stringifyBoolQuery(query, 'AND', 'OR', ' = ');
     const res = await this.client.index(collectionName).search(keyword, {
       filter: newQuery,
     });

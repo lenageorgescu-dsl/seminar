@@ -257,9 +257,7 @@ export abstract class SearchEngineService {
       }
       const key = Object.keys(query.and[i]).pop();
       res += key;
-      res += ' ';
       res += equals;
-      res += ' ';
       res += query.and[i][key];
     }
     for (let i = 0; i < query.or.length; i++) {
@@ -270,9 +268,7 @@ export abstract class SearchEngineService {
       }
       const key = Object.keys(query.or[i]).pop();
       res += key;
-      res += ' ';
       res += equals;
-      res += ' ';
       res += query.or[i][key];
     }
     console.log(res);
