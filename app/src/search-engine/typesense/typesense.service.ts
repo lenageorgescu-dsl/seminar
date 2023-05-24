@@ -46,7 +46,7 @@ export class TypesenseService extends SearchEngineService {
     const fields = this.getFieldsFromBoolQuery(query);
     const query_by: string = this.stringifyFields(fields);
     const filter = this.stringifyBoolQuery(query, '&&', '||', ':');
-    const searchParams = { q: keyword, query_by: query_by, filter_by: filter };
+    const searchParams = { q: '', query_by: query_by, filter_by: filter };
     console.log('query: ', searchParams);
     const res = await this.client
       .collections(collectionName)

@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Client } from '@elastic/elasticsearch';
 import { estypes } from '@elastic/elasticsearch';
 import { estypesWithBody } from '@elastic/elasticsearch';
-import { SearchEngineService } from '../search-engine.service';
+import { BoolQuery, SearchEngineService } from '../search-engine.service';
 
 interface Document {
   character: string;
@@ -33,6 +33,58 @@ export class ElasticService extends SearchEngineService {
         },
       })
       .then((res) => console.log(res));
+  }
+
+  protected override async boolQuery(
+    collectionName: string,
+    keyword: string,
+    query: BoolQuery,
+  ) {
+    await this.client.indices.refresh({ index: collectionName });
+    const and = this.formatAND(query);
+    const or = this.reduce(this.formatOR(query)); //makes array into object
+    const result = await this.client.search<Document>({
+      index: collectionName,
+      query: {
+        bool: {
+          should: [
+            or,
+            {
+              bool: {
+                must: and,
+              },
+            },
+          ],
+        },
+      },
+    });
+    return (result as undefined as any).hits.total.value;
+  }
+
+  private formatAND(query: BoolQuery) {
+    const res: any[] = [];
+    for (let i = 0; i < query.and.length; i++) {
+      const obj = { match: query.and[i] };
+      res.push(obj);
+    }
+    return res;
+  }
+
+  private reduce(arr: any[]) {
+    const obj = arr.reduce((acc, cur, i) => {
+      acc[i] = cur;
+      return acc;
+    }, {});
+    return obj;
+  }
+
+  private formatOR(query: BoolQuery) {
+    const res: any[] = [];
+    for (let i = 0; i < query.or.length; i++) {
+      const obj = { match: query.or[i] };
+      res.push(obj);
+    }
+    return res;
   }
 
   protected override async placeholderQuery(collectionName: string) {
