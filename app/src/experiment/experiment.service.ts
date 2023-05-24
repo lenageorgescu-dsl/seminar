@@ -21,6 +21,7 @@ export class ExperimentService implements OnApplicationBootstrap {
   public async runExperiment(version: number) {
     this.setVersion(version);
     this.setResultPath();
+    this.getInitialValues();
     await this.indexAll('tweets');
     await this.indexAll('articles');
 
@@ -49,6 +50,12 @@ export class ExperimentService implements OnApplicationBootstrap {
     await this.typesense.placeholderSearch(collectionName);
     await this.meili.placeholderSearch(collectionName);
     await this.elastic.placeholderSearch(collectionName);
+  }
+
+  private async getInitialValues() {
+    await this.typesense.initialValues();
+    await this.meili.initialValues();
+    await this.elastic.initialValues();
   }
 
   private setVersion(version: number) {

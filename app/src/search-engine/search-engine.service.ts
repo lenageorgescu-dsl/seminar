@@ -15,6 +15,22 @@ export abstract class SearchEngineService {
   protected experimentNumber = 42;
   protected path = `${ExperimentService.getResultPath()}-foobar`;
 
+  public async initialValues() {
+    const data = await this.getContainerData(this.engineName);
+    const storage = await this.getStorage();
+    const res = JSON.stringify({
+      experiment: this.experimentNumber,
+      engine: this.engineName,
+      operation: 'init',
+      memPercent: data.memPercent,
+      cpuPercent: data.cpuPercent,
+      storageMega: storage,
+    });
+    console.log('INIT: ');
+    console.log(res);
+
+    writeFileSync(this.path, res, { flag: 'a' });
+  }
   public async indexDocuments(collectionName: string) {
     try {
       const data = this.loadData(`../app/assets/data/${collectionName}.json`);
@@ -148,9 +164,8 @@ export abstract class SearchEngineService {
       const data = JSON.stringify({
         experiment: this.experimentNumber,
         engine: this.engineName,
-        operation: 'facetedSearch',
+        operation: 'boolQuerySearch',
         collection: collectionName,
-        keyword: keyword,
         boolQuery: query,
         hits: hits,
         startTime,
@@ -187,7 +202,7 @@ export abstract class SearchEngineService {
         const data = await this.getContainerData(this.engineName);
         cpuStats.push(data.cpuPercent);
         memStats.push(data.memPercent);
-      }, 1);
+      }, 0.1);
 
       const startTime = Date.now();
       const hits = await this.placeholderQuery(collectionName);
