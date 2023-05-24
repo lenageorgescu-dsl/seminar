@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { readFileSync } from 'fs';
 import { Client } from 'typesense';
 import { CollectionCreateSchema } from 'typesense/lib/Typesense/Collections';
-import { SearchEngineService } from '../search-engine.service';
+import { BoolQuery, SearchEngineService } from '../search-engine.service';
 
 @Injectable()
 export class TypesenseService extends SearchEngineService {
@@ -38,16 +38,22 @@ export class TypesenseService extends SearchEngineService {
     return keys;
   }
 
+  protected override boolQuery(
+    collectionName: string,
+    keyword: string,
+    query: BoolQuery,
+  ) {
+    return 'foo';
+  }
+
   protected override async placeholderQuery(collectionName: string) {
     const keys = this.getAllKeys(collectionName);
     const formatedKeys = this.stringifyFields(keys);
     const searchParams = { q: '', query_by: formatedKeys };
-    //console.log('query: ', searchParams);
     const res = await this.client
       .collections(collectionName)
       .documents()
       .search(searchParams);
-    //console.log(JSON.stringify(res, null, 2));
     return res.found;
   }
 
@@ -63,7 +69,6 @@ export class TypesenseService extends SearchEngineService {
       .collections(collectionName)
       .documents()
       .search(searchParams);
-    //console.log(JSON.stringify(res, null, 2));
     return res.found;
   }
 }

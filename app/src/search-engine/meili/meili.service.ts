@@ -2,7 +2,6 @@ import { Inject, Injectable } from '@nestjs/common';
 import MeiliSearch, { Task } from 'meilisearch';
 import { BoolQuery, SearchEngineService } from '../search-engine.service';
 import { setIntervalAsync, clearIntervalAsync } from 'set-interval-async';
-import Tasks from '@elastic/elasticsearch/lib/api/api/tasks';
 
 @Injectable()
 export class MeiliService extends SearchEngineService {
@@ -12,6 +11,14 @@ export class MeiliService extends SearchEngineService {
   }
 
   protected override async createCollection(collectionName: string, data: any) {
+    await this.taskAlreadyExists(collectionName);
+    const enquededTask = await this.client
+      .index(collectionName)
+      .addDocuments(data);
+    await this.checkStatus(enquededTask.taskUid);
+  }
+
+  private async taskAlreadyExists(collectionName: string) {
     const res = (await this.client.getTasks({ indexUids: [collectionName] }))
       .results;
     if (res.length > 0 && !this.allTasksFailed(res)) {
@@ -20,10 +27,6 @@ export class MeiliService extends SearchEngineService {
         'Task ' + collectionName + ' already exists, will not be indexed again',
       );
     }
-    const enquededTask = await this.client
-      .index(collectionName)
-      .addDocuments(data);
-    await this.checkStatus(enquededTask.taskUid);
   }
 
   protected override async multiMatchQuery(
@@ -46,8 +49,9 @@ export class MeiliService extends SearchEngineService {
     return new Promise<void>(async (resolve, reject) => {
       const id = setIntervalAsync(async () => {
         const status = (await this.client.getTask(taskId)).status;
-        console.log('Proccessing task ', taskId);
+        console.log('Meili proccessing task ', taskId);
         if (status == 'succeeded') {
+          console.log('Meili finished indexing ', taskId);
           clearIntervalAsync(id);
           resolve();
         }
@@ -57,32 +61,25 @@ export class MeiliService extends SearchEngineService {
     });
   }
 
-  private arrayUnique(arr) {
-    const a = arr.concat();
-    for (let i = 0; i < a.length; ++i) {
-      for (let j = i + 1; j < a.length; ++j) {
-        if (a[i] === a[j]) a.splice(j--, 1);
-      }
-    }
-
-    return a;
+  protected override async boolQuery(
+    collectionName: string,
+    keyword: string,
+    query: BoolQuery,
+  ) {
+    await this.reindex(collectionName, query);
+    const newQuery = this.stringifyBoolQuery(query, 'AND', 'OR', '=');
+    const res = await this.client.index(collectionName).search(keyword, {
+      filter: newQuery,
+    });
+    return res.estimatedTotalHits;
   }
 
-  protected override async boolQuery(collectionName: string, query: BoolQuery) {
-    console.log(collectionName);
-    const fields = this.arrayUnique(query.and.concat(query.or));
-    //await this.client.index(collectionName).updateFilterableAttributes(fields);
+  private async reindex(collectionName: string, query: BoolQuery) {
+    const fields = this.getFieldsFromBoolQuery(query);
     const res = await this.client
       .index(collectionName)
-      .updateFilterableAttributes(['title'])
-      .catch((e) => {
-        console.log(e);
-      });
-    console.log(res);
-    // this.client
-    //   .index(collectionName)
-    //   .search('title = the AND authors = Rowling')
-    //   .then((res) => { private async fetchStatus(id: number) {
+      .updateFilterableAttributes(fields);
+    await this.checkStatus(res.taskUid);
   }
 
   private allTasksFailed(arr: Task[]): boolean {

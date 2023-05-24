@@ -5,15 +5,15 @@ import { ExperimentService } from '../experiment/experiment.service';
 import { promisify } from 'util';
 
 export type BoolQuery = {
-  and: string[];
-  or: string[];
+  and: any[];
+  or: any[];
 };
 
 @Injectable()
 export abstract class SearchEngineService {
   protected engineName: string;
   protected experimentNumber = 42;
-  protected path = 'foobar';
+  protected path = `${ExperimentService.getResultPath()}-foobar`;
 
   public async indexDocuments(collectionName: string) {
     try {
@@ -128,7 +128,11 @@ export abstract class SearchEngineService {
     }
   }
 
-  public async boolQuerySearch(collectionName: string, query: BoolQuery) {
+  public async boolQuerySearch(
+    collectionName: string,
+    keyword: string,
+    query: BoolQuery,
+  ) {
     try {
       const cpuStats: Array<number> = [];
       const memStats: Array<number> = [];
@@ -138,14 +142,15 @@ export abstract class SearchEngineService {
         memStats.push(data.memPercent);
       }, 5);
       const startTime = Date.now();
-      const hits = await this.boolQuery(collectionName, query);
+      const hits = await this.boolQuery(collectionName, keyword, query);
       const endTime = Date.now();
       clearInterval(intervalId);
       const data = JSON.stringify({
         experiment: this.experimentNumber,
         engine: this.engineName,
-        operation: 'placeholderSearch',
+        operation: 'facetedSearch',
         collection: collectionName,
+        keyword: keyword,
         boolQuery: query,
         hits: hits,
         startTime,
@@ -162,7 +167,11 @@ export abstract class SearchEngineService {
     }
   }
 
-  protected boolQuery(collectionName: string, query: BoolQuery) {
+  protected boolQuery(
+    collectionName: string,
+    keyword: string,
+    query: BoolQuery,
+  ) {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve('boolQuery');
@@ -231,6 +240,69 @@ export abstract class SearchEngineService {
       res += fields[i];
     }
     return res;
+  }
+
+  protected stringifyBoolQuery(
+    query: BoolQuery,
+    and: string,
+    or: string,
+    equals: string,
+  ): string {
+    let res = '';
+    for (let i = 0; i < query.and.length; i++) {
+      if (res != '') {
+        res += ' ';
+        res += and;
+        res += ' ';
+      }
+      const key = Object.keys(query.and[i]).pop();
+      res += key;
+      res += ' ';
+      res += equals;
+      res += ' ';
+      res += query.and[i][key];
+    }
+    for (let i = 0; i < query.or.length; i++) {
+      if (res != '') {
+        res += ' ';
+        res += or;
+        res += ' ';
+      }
+      const key = Object.keys(query.or[i]).pop();
+      res += key;
+      res += ' ';
+      res += equals;
+      res += ' ';
+      res += query.or[i][key];
+    }
+    console.log(res);
+    return res;
+  }
+
+  protected getFieldsFromBoolQuery(query: BoolQuery): string[] {
+    const fieldsAnd: string[] = [];
+    const fieldsOr: string[] = [];
+    for (let i = 0; i < query.and.length; i++) {
+      const keys = Object.keys(query.and[i]).pop();
+      fieldsAnd.push(keys);
+    }
+    for (let i = 0; i < query.or.length; i++) {
+      const keys = Object.keys(query.or[i]).pop();
+      fieldsOr.push(keys);
+    }
+    const fields = this.arrayUnique(fieldsAnd.concat(fieldsOr));
+    return fields;
+  }
+
+  private arrayUnique(arr) {
+    const a = arr.concat();
+    for (let i = 0; i < a.length; ++i) {
+      for (let j = i + 1; j < a.length; ++j) {
+        if (a[i] === a[j]) a.splice(j--, 1);
+      }
+    }
+
+    return a;
   }
 
   private loadData(path: string) {
