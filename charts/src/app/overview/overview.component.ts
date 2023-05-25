@@ -43,4 +43,12 @@ export class OverviewComponent {
     this.hideSpeed = !this.hideSpeed;
   }
 
+  toggleCpu(){
+    this.hideCpu = !this.hideCpu;
+  }
+
+  toggleMemory(){
+    this.hideMemory = ! this.hideMemory;
+  }
+
 }

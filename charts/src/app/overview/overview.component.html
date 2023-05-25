@@ -1,7 +1,9 @@
 <p>overview works!</p>
 <button mat-button mat-raised-button color="primary" (click)="toggleSpeed()">Speed</button>
 <button mat-button mat-raised-button color="primary" (click)="toggleStorage()">Storage</button>
-<app-cpu [hidden]='hideCpu'></app-cpu>
+<button mat-button mat-raised-button color="primary" (click)="toggleCpu()">CPU</button>
+<button mat-button mat-raised-button color="primary" (click)="toggleMemory()">Memory</button>
+<app-cpu [hidden]='hideCpu' [indexData]="indexData" [placeholderData]="placeholderSearchData"></app-cpu>
 <app-memory [hidden]='hideMemory'></app-memory>
 <app-speed [hidden]='hideSpeed' [indexData]="indexData" [placeholderData]="placeholderSearchData"></app-speed>
 <app-storage [hidden]='hideStorage' [data]="storageData"> </app-storage>

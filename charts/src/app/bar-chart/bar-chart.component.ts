@@ -21,7 +21,6 @@ export class BarChartComponent {
 
    ngOnChanges(){
     this.barChartOptions!.plugins!.title!.text= this.inputData.title;
-    console.log (this.barChartOptions!.plugins!.title!.text)
     this.barChartData.labels = this.inputData.labels;
     this.barChartData.datasets = this.inputData.datasets;
     this.update();
