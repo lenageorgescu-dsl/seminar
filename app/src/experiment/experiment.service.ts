@@ -27,6 +27,17 @@ export class ExperimentService implements OnApplicationBootstrap {
     await this.indexAll('articles');
     await this.placeholderSearchAll('articles');
 
+    await this.keywordSearchAll('tweets', '@elonmusk good night from Nigeria', [
+      'text',
+    ]);
+    await this.keywordSearchAll('tweets', 'Tesla', ['text']);
+    await this.keywordSearchAll(
+      'articles',
+      '2019 Size, Share, Growth, Demand, Analysis, Research, Trends, Forecast, Applications, Products, Types, Technology, Production, Cost, Price, Profit, Leading Suppliers, Manufacturing Plants, Regions, Vendors',
+      ['description'],
+    );
+    await this.keywordSearchAll('articles', 'Markets', ['description']);
+
     await this.parseResults(version);
     console.log('FINISHED EXPERIMENT ', version);
   }
