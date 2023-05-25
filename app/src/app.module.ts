@@ -2,7 +2,6 @@ import { HttpModule } from '@nestjs/axios';
 import { Module, Provider } from '@nestjs/common';
 import {
   AppController,
-  DataController,
   ExperimentController,
   IndexController,
   SearchController,
@@ -17,7 +16,6 @@ import MeiliSearch from 'meilisearch';
 import { Client as ElastiClient } from '@elastic/elasticsearch';
 import { SearchService } from './search/search.service';
 import { ExperimentService } from './experiment/experiment.service';
-import { DataService } from './data/data.service';
 
 const typeSenseProvider: Provider = {
   provide: 'Typesense',
@@ -55,7 +53,6 @@ const elasticProvider: Provider = {
     SearchController,
     IndexController,
     ExperimentController,
-    DataController,
   ],
   providers: [
     AppService,
@@ -68,7 +65,6 @@ const elasticProvider: Provider = {
     elasticProvider,
     SearchService,
     ExperimentService,
-    DataService,
   ],
 })
 export class AppModule {}

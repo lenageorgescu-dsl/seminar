@@ -5,7 +5,6 @@ import { ElasticService } from './search-engine/elastic/elastic.service';
 import { MeiliService } from './search-engine/meili/meili.service';
 import { TypesenseService } from './search-engine/typesense/typesense.service';
 import { SearchService } from './search/search.service';
-import { DataService } from './data/data.service';
 
 @Controller()
 export class AppController {
@@ -81,16 +80,5 @@ export class ExperimentController {
   compileResults(@Param('from') from: number, @Param('to') to: number) {
     this.experiment.compileResults(from, to);
     return 'Compiling results finished';
-  }
-}
-
-@Controller('data')
-export class DataController {
-  constructor(private readonly dataService: DataService) {}
-
-  @Get(':version')
-  async run(@Param('version') version: number) {
-    this.dataService.parseData(version);
-    return 'foobar';
   }
 }

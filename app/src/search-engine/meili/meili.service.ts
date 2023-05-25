@@ -16,6 +16,8 @@ export class MeiliService extends SearchEngineService {
       .index(collectionName)
       .addDocuments(data);
     await this.checkStatus(enquededTask.taskUid);
+    const fields = this.getAllKeys(data);
+    await this.reindex(collectionName, fields);
   }
 
   private async taskAlreadyExists(collectionName: string) {
@@ -27,6 +29,11 @@ export class MeiliService extends SearchEngineService {
         'Task ' + collectionName + ' already exists, will not be indexed again',
       );
     }
+  }
+  private getAllKeys(data: any): string[] {
+    const res = data[0];
+    const arr = Object.keys(res);
+    return arr;
   }
 
   protected override async multiMatchQuery(
@@ -66,7 +73,6 @@ export class MeiliService extends SearchEngineService {
     keyword: string,
     query: BoolQuery,
   ) {
-    await this.reindex(collectionName, query);
     const newQuery = this.stringifyBoolQuery(query, 'AND', 'OR', ' = ');
     const res = await this.client.index(collectionName).search('', {
       filter: newQuery,
@@ -74,8 +80,7 @@ export class MeiliService extends SearchEngineService {
     return res.estimatedTotalHits;
   }
 
-  private async reindex(collectionName: string, query: BoolQuery) {
-    const fields = this.getFieldsFromBoolQuery(query);
+  private async reindex(collectionName: string, fields: string[]) {
     const res = await this.client
       .index(collectionName)
       .updateFilterableAttributes(fields);

@@ -14,9 +14,12 @@ export class SearchService {
   public async searchData() {
     //await this.typesense.keywordbla('tweets', 'dark');
     //await this.typesense.placeholderSearch('test');
-    await this.typesense.boolQuerySearch('books', 'foo', {
-      and: [{ language: 'the' }, { genres: 'JK Rowling' }],
-      or: [{ description: 'foo' }, { rating: 'bar' }],
-    });
+    // await this.typesense.boolQuerySearch('books', 'foo', {
+    //   and: [{ language: 'the' }, { genres: 'JK Rowling' }],
+    //   or: [{ description: 'foo' }, { rating: 'bar' }],
+    // });
+    await this.elastic.placeholderSearch('tweets');
+    await this.meili.placeholderSearch('tweets');
+    await this.typesense.placeholderSearch('tweets');
   }
 }

@@ -30,10 +30,11 @@ export class OverviewComponent {
   placeholderSearchData: any[] = [];
 
   async ngOnInit(): Promise<void> {
-    const repoInfo = 'assets/1_experiment.json';
+    const repoInfo = 'assets/2_experiment.json';
      const data = this.http
       .get<any[]>(repoInfo) //GeneralData array
       .subscribe((data) =>{
+        console.log(data)
         this.initData = data.filter((s: any)=> s.operation == 'init');
         this.storageData = data.filter((s)=> (s.operation == 'init' || s.operation == 'index')).map((s)=>({name: 'Storage', operation: s.operation, engine: s.engine, collection: s.collection, storage: s.storageMega}));
         this.indexData = data.filter((s)=> s.operation == 'index');

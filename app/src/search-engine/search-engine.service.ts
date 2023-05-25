@@ -3,6 +3,7 @@ import { dockerContainers, dockerContainerStats } from 'dockerstats';
 import { readFileSync, writeFileSync } from 'fs';
 import { ExperimentService } from '../experiment/experiment.service';
 import { promisify } from 'util';
+import { clearIntervalAsync, setIntervalAsync } from 'set-interval-async';
 
 export type BoolQuery = {
   and: any[];
@@ -36,10 +37,10 @@ export abstract class SearchEngineService {
       const data = this.loadData(`../app/assets/data/${collectionName}.json`);
       const cpuStats: Array<number> = [];
       const memStats: Array<number> = [];
-      const containerData = await this.getContainerData(this.engineName);
+      let containerData = await this.getContainerData(this.engineName);
       cpuStats.push(containerData.cpuPercent);
       memStats.push(containerData.memPercent);
-      const intervalId = setInterval(async () => {
+      const intervalId = setIntervalAsync(async () => {
         const data = await this.getContainerData(this.engineName);
         cpuStats.push(data.cpuPercent);
         memStats.push(data.memPercent);
@@ -48,7 +49,10 @@ export abstract class SearchEngineService {
       const startTime = Date.now();
       await this.createCollection(collectionName, data);
       const endTime = Date.now();
-      clearInterval(intervalId);
+      await clearIntervalAsync(intervalId);
+      containerData = await this.getContainerData(this.engineName);
+      cpuStats.push(containerData.cpuPercent);
+      memStats.push(containerData.memPercent);
       const storageAfter = await this.getStorage();
       const res = JSON.stringify({
         experiment: this.experimentNumber,
@@ -70,41 +74,6 @@ export abstract class SearchEngineService {
     }
   }
 
-  private async getStorage() {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const exec = promisify(require('node:child_process').exec);
-    const { stdout } = await exec('du -h --max-depth=1', {
-      cwd: '../search-engine-volumes',
-    });
-    const arr: string[] = stdout.split(/\r?\n/);
-    const str = arr
-      .filter((element) => element.includes(this.engineName))
-      .pop();
-    const amount = str.split('./')[0];
-    let firstPart = ~~amount.slice(0, amount.length - 2);
-    const secondPart = amount.slice(amount.length - 2);
-    if (secondPart.includes('K')) firstPart /= 1000;
-    if (secondPart.includes('G')) firstPart *= 1000;
-    return firstPart;
-  }
-
-  protected createCollection(collectionName: string, data: any) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve('foo');
-      }, 5000);
-    });
-  }
-
-  private async getContainerData(name: string) {
-    const container = (await dockerContainers())
-      .filter((container) => container.name == name)
-      .pop();
-    const id = container.id;
-    const data = (await dockerContainerStats(id)).pop();
-    return data;
-  }
-
   public async keywordSearch(
     collectionName: string,
     keyword: string,
@@ -113,15 +82,15 @@ export abstract class SearchEngineService {
     try {
       const cpuStats: Array<number> = [];
       const memStats: Array<number> = [];
-      const intervalId = setInterval(async () => {
+      const intervalId = setIntervalAsync(async () => {
         const data = await this.getContainerData(this.engineName);
         cpuStats.push(data.cpuPercent);
         memStats.push(data.memPercent);
-      }, 5);
+      }, 1);
       const startTime = Date.now();
       const hits = await this.multiMatchQuery(collectionName, keyword, fields);
       const endTime = Date.now();
-      clearInterval(intervalId);
+      await clearIntervalAsync(intervalId);
       const data = JSON.stringify({
         experiment: this.experimentNumber,
         engine: this.engineName,
@@ -152,15 +121,15 @@ export abstract class SearchEngineService {
     try {
       const cpuStats: Array<number> = [];
       const memStats: Array<number> = [];
-      const intervalId = setInterval(async () => {
+      const intervalId = setIntervalAsync(async () => {
         const data = await this.getContainerData(this.engineName);
         cpuStats.push(data.cpuPercent);
         memStats.push(data.memPercent);
-      }, 5);
+      }, 1);
       const startTime = Date.now();
       const hits = await this.boolQuery(collectionName, keyword, query);
       const endTime = Date.now();
-      clearInterval(intervalId);
+      await clearIntervalAsync(intervalId);
       const data = JSON.stringify({
         experiment: this.experimentNumber,
         engine: this.engineName,
@@ -198,16 +167,22 @@ export abstract class SearchEngineService {
     try {
       const cpuStats: Array<number> = [];
       const memStats: Array<number> = [];
-      const intervalId = setInterval(async () => {
+      let containerData = await this.getContainerData(this.engineName);
+      cpuStats.push(containerData.cpuPercent);
+      memStats.push(containerData.memPercent);
+      const intervalId = setIntervalAsync(async () => {
         const data = await this.getContainerData(this.engineName);
         cpuStats.push(data.cpuPercent);
         memStats.push(data.memPercent);
-      }, 0.1);
-
+      }, 1);
       const startTime = Date.now();
       const hits = await this.placeholderQuery(collectionName);
       const endTime = Date.now();
-      clearInterval(intervalId);
+      await clearIntervalAsync(intervalId);
+      containerData = await this.getContainerData(this.engineName);
+      cpuStats.push(containerData.cpuPercent);
+      memStats.push(containerData.memPercent);
+
       const data = JSON.stringify({
         experiment: this.experimentNumber,
         engine: this.engineName,
@@ -234,6 +209,40 @@ export abstract class SearchEngineService {
         resolve('placeholderQuery');
       }, 5000);
     });
+  }
+  private async getStorage() {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const exec = promisify(require('node:child_process').exec);
+    const { stdout } = await exec('du -h --max-depth=1', {
+      cwd: '../search-engine-volumes',
+    });
+    const arr: string[] = stdout.split(/\r?\n/);
+    const str = arr
+      .filter((element) => element.includes(this.engineName))
+      .pop();
+    const amount = str.split('./')[0];
+    let firstPart = ~~amount.slice(0, amount.length - 2);
+    const secondPart = amount.slice(amount.length - 2);
+    if (secondPart.includes('K')) firstPart /= 1000;
+    if (secondPart.includes('G')) firstPart *= 1000;
+    return firstPart;
+  }
+
+  protected createCollection(collectionName: string, data: any) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve('foo');
+      }, 5000);
+    });
+  }
+
+  private async getContainerData(name: string) {
+    const container = (await dockerContainers())
+      .filter((container) => container.name == name)
+      .pop();
+    const id = container.id;
+    const data = (await dockerContainerStats(id)).pop();
+    return data;
   }
 
   protected multiMatchQuery(

@@ -23,10 +23,10 @@ export class ExperimentService implements OnApplicationBootstrap {
     this.setResultPath();
     this.getInitialValues();
     await this.indexAll('tweets');
-    await this.indexAll('articles');
-
-    await this.placeholderSearchAll('articles');
     await this.placeholderSearchAll('tweets');
+    await this.indexAll('articles');
+    await this.placeholderSearchAll('articles');
+
     await this.parseResults(version);
     console.log('FINISHED EXPERIMENT ', version);
   }
