@@ -9,7 +9,8 @@ import { FilterService } from '../filter.service';
 })
 export class CpuComponent {
 
-
+  @Input() key: string = ''
+  @Input() name: string = ''
 
   @Input() indexData: any[]=[]
   @Input() placeholderData: any[]=[]
@@ -24,20 +25,39 @@ export class CpuComponent {
   }
 
    ngOnChanges(){
-    this.indexLineDataTweets = this.parseIndexDataTweets();
-    //this.indexLineDataArticles = this.parseIndexDataArticles();
-    //this.placeholderLineData= this.parsePlaceholderData();
+    this.indexLineDataTweets = this.parseDataTweets(this.indexData, 'indexing');
+    this.indexLineDataArticles = this.parseDataArticles(this.indexData, 'indexing');
+    this.placeholderLineDataTweets = this.parseDataTweets(this.placeholderData, 'placeholderSearching');
+    this.placeholderLineDataArticles = this.parseDataArticles(this.placeholderData, 'placeholderSearching');
+    console.log(this.indexData);
+    console.log(this.placeholderData);
+  }
+  
+
+
+  parseDataTweets(input: any, title: string): lineChartInput{
+    const tweetData = this.filterService.getTweets(input);
+    const data = this.filterService.getArrNumber(tweetData, `${this.key}Percent`);
+    const res: lineChartInput = {
+      title: `${this.name} Percentage while ${title} the Tweets-Collection`,
+      data: data,
+      xLabels: this.filterService.getxLabels(data)
+    }
+    console.log(title);
+    console.log(res);
+    return res;
   }
 
-  parseIndexDataTweets(): lineChartInput{
-    const tweetData = this.filterService.getTweets(this.indexData);
-    const data = this.filterService.getArrNumber(tweetData, 'cpuPercent');
+  parseDataArticles(input: any, title: string): lineChartInput{
+    const articleData = this.filterService.getArticles(input);
+    const data = this.filterService.getArrNumber(articleData, `${this.key}Percent`);
     const res: lineChartInput = {
-      title: 'CPU Percentage while indexing the Tweets-Collection',
+      title: `${this.name} Percentage while ${title} the Articles-Collection`,
       data: data,
       xLabels: this.filterService.getxLabels(data)
     }
     return res;
+
   }
 
 }

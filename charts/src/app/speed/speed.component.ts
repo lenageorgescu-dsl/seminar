@@ -22,35 +22,22 @@ export class SpeedComponent {
   }
 
   ngOnChanges(){
-    this.indexBarData = this.parseIndexData();
-    this.placeholderBarData = this.parsePlaceholderData();
+    this.indexBarData = this.parseSmallerData(this.indexData, 'Index');
+    this.placeholderBarData = this.parseSmallerData(this.placeholderData, 'PlaceholderSearch');
 
   }
 
 
-  parseIndexData(): barChartInput{
-    const tweetData = this.filterService.getTweets(this.indexData);
-    const articleData = this.filterService.getArticles(this.indexData);
+  parseSmallerData(input: any, title: string): barChartInput{
+    const tweetData = this.filterService.getTweets(input);
+    const articleData = this.filterService.getArticles(input);
     const data = [{data: this.filterService.getNumbers(tweetData, 'running'), label: 'Tweets'},{data: this.filterService.getNumbers(articleData, 'running'), label: 'Articles'},]
     const res: barChartInput = {
-      title: 'Index-Speed in MilliSeconds',
+      title: `${title}-Speed in MilliSeconds`,
       labels: defaultLabels,
       datasets: data
     }
     return res;
-  }
-
-  parsePlaceholderData(): barChartInput{
-    const tweetData = this.filterService.getTweets(this.placeholderData);
-    const articleData = this.filterService.getArticles(this.placeholderData);
-    const data = [{data: this.filterService.getNumbers(tweetData, 'running'), label: 'Tweets'},{data: this.filterService.getNumbers(articleData, 'running'), label: 'Articles'},]
-    const res: barChartInput = {
-      title: 'PlaceholderSearch in MilliSeconds',
-      labels: defaultLabels,
-      datasets: data
-    }
-    return res;
-
   }
 
 

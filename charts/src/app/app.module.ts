@@ -17,7 +17,6 @@ import { BarChartComponent } from './bar-chart/bar-chart.component';
 import { OverviewComponent } from './overview/overview.component';
 import { LineChartComponent } from './line-chart/line-chart.component';
 import { CpuComponent } from './cpu/cpu.component';
-import { MemoryComponent } from './memory/memory.component';
 import { SpeedComponent } from './speed/speed.component';
 import { StorageComponent } from './storage/storage.component';
 
@@ -29,7 +28,6 @@ import { StorageComponent } from './storage/storage.component';
     OverviewComponent,
     LineChartComponent,
     CpuComponent,
-    MemoryComponent,
     SpeedComponent,
     StorageComponent,
   ],

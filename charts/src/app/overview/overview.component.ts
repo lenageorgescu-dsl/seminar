@@ -13,6 +13,12 @@ export class OverviewComponent {
     private http: HttpClient,
   ) {}
 
+  cpuKey = 'cpu';
+  cpuName = 'CPU';
+
+  memKey = 'mem';
+  memName = 'Memory'
+
   hideMemory = true;
   hideCpu = true;
   hideSpeed = true;
@@ -27,7 +33,7 @@ export class OverviewComponent {
     const repoInfo = 'assets/1_experiment.json';
      const data = this.http
       .get<any[]>(repoInfo) //GeneralData array
-      .subscribe((data) =>{ console.log(data)
+      .subscribe((data) =>{
         this.initData = data.filter((s: any)=> s.operation == 'init');
         this.storageData = data.filter((s)=> (s.operation == 'init' || s.operation == 'index')).map((s)=>({name: 'Storage', operation: s.operation, engine: s.engine, collection: s.collection, storage: s.storageMega}));
         this.indexData = data.filter((s)=> s.operation == 'index');
@@ -35,20 +41,31 @@ export class OverviewComponent {
       })
   }
 
-  toggleStorage(){
-    this.hideStorage = !this.hideStorage;
+  openStorage(){
+    this.closeAll();
+    this.hideStorage = false;
   }
 
-  toggleSpeed(){
-    this.hideSpeed = !this.hideSpeed;
+  openSpeed(){
+    this.closeAll();
+    this.hideSpeed = false
   }
 
-  toggleCpu(){
-    this.hideCpu = !this.hideCpu;
+  openCpu(){
+    this.closeAll();
+    this.hideCpu = false;
   }
 
-  toggleMemory(){
-    this.hideMemory = ! this.hideMemory;
+  openMemory(){
+    this.closeAll();
+    this.hideMemory = false;
+  }
+
+  private closeAll(){
+    this.hideCpu = true;
+    this.hideMemory = true;
+    this.hideSpeed = true;
+    this.hideStorage = true;
   }
 
 }

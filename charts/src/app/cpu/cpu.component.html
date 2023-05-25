@@ -1,6 +1,9 @@
 <p>
   <mat-toolbar>
-    <span>CPU</span>
+    <span>{{name}}</span>
   </mat-toolbar>
 </p>
 <app-line-chart [inputData]="indexLineDataTweets"></app-line-chart>
+<app-line-chart [inputData]="indexLineDataArticles"></app-line-chart>
+<app-line-chart [inputData]="placeholderLineDataTweets"></app-line-chart>
+<app-line-chart [inputData]="placeholderLineDataArticles"></app-line-chart>
