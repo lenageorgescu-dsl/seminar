@@ -1,6 +1,16 @@
-import { Component } from '@angular/core';
-import Chart from 'chart.js/auto';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { switchMap, zipAll } from 'rxjs/operators';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { BehaviorSubject } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
+//import { DialogChartsComponent } from '../dialog-charts/dialog-charts.component';
 import { HttpClient } from '@angular/common/http';
+import { ChartConfiguration, ChartData, ChartEvent, ChartType } from 'chart.js';
+import { BaseChartDirective } from 'ng2-charts';
+
+
+import DataLabelsPlugin from 'chartjs-plugin-datalabels';
+import { barChartInput, defaultBarChartInput } from './interfaces';
 
 @Component({
   selector: 'app-bar-chart',
@@ -9,91 +19,77 @@ import { HttpClient } from '@angular/common/http';
 })
 export class BarChartComponent {
 
-  constructor(private http: HttpClient){}
+  constructor(
+  ) {}
 
-  ngOnInit(): void {
-    this.createChart();
+   @Input() inputData: barChartInput = defaultBarChartInput;
+
+
+   ngOnChanges(){
+    this.barChartOptions!.plugins!.title!.text= this.inputData.title;
+    this.barChartData.labels = this.inputData.labels;
+    this.barChartData.datasets = this.inputData.datasets;
+    this.chart?.update;
+   }
+
+   @ViewChild(BaseChartDirective) chart: BaseChartDirective | undefined;
+
+  public barChartOptions: ChartConfiguration['options'] = {
+    responsive: true,
+    // We use these empty structures as placeholders for dynamic theming.
+    scales: {
+      x: {},
+      y: {
+        min: 10
+      }
+    },
+    plugins: {
+      legend: {
+        display: true,
+      },
+      datalabels: {
+        anchor: 'end',
+        align: 'end'
+      },
+      title: {
+        display: true,
+        text: 'Title'
+      }
+    }
+  };
+  public barChartType: ChartType = 'bar';
+  public barChartPlugins = [
+    DataLabelsPlugin
+  ];
+
+  public barChartData: ChartData<'bar'> = {
+    labels: [ '2006', '2007', '2008', '2009', '2010', '2011', '2012' ],
+    datasets: [
+      { data: [ 65, 59, 80, 81, 56, 55, 40 ], label: 'Series A' },
+      { data: [ 28, 48, 40, 19, 86, 27, 90 ], label: 'Series B' }
+    ]
+  };
+
+  // events
+  public chartClicked({ event, active }: { event?: ChartEvent, active?: {}[] }): void {
+    console.log(event, active);
   }
 
+  public chartHovered({ event, active }: { event?: ChartEvent, active?: {}[] }): void {
+    //console.log(event, active);
+  }
 
-  public indexSpeedTweets: any;
-  public indexCpuTweets: any;
-  public indexMemTweets: any;
-  public data: any
+  public randomize(): void {
+    // Only Change 3 values
+    this.barChartData.datasets[0].data = [
+      Math.round(Math.random() * 100),
+      59,
+      80,
+      Math.round(Math.random() * 100),
+      56,
+      Math.round(Math.random() * 100),
+      40 ];
 
-
-  async createChart(){
-    let bla;
-  const elasticData = this.http.get<any[]>('assets/2-elastic-index-tweets-.json').subscribe(data => {
-    bla = data;
-})
-console.log(bla)
-const meiliData = this.http.get<any[]>('assets/2-meili-index-tweets-.json').subscribe(data => {
-    console.log(data);
-})
-const typesenseData = this.http.get<any[]>('assets/2-typesense-index-tweets-.json').subscribe(data => {
-    console.log(data);
-})
-
-
-  this.indexSpeedTweets = new Chart("indexSpeedTweets", {
-    type: 'bar',
-    data: {
-      labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-      datasets: [{
-        label: '# of Votes',
-        data: [12, 19, 3, 5, 2, 3],
-        borderWidth: 1
-      }]
-    },
-    options: {
-      scales: {
-        y: {
-          beginAtZero: true
-        }
-      }
-    }
-  });
-
-   this.indexCpuTweets = new Chart("indexCpuTweets", {
-    type: 'bar',
-    data: {
-      labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-      datasets: [{
-        label: '# of Votes',
-        data: [12, 19, 3, 5, 2, 3],
-        borderWidth: 1
-      }]
-    },
-    options: {
-      scales: {
-        y: {
-          beginAtZero: true
-        }
-      }
-    }
-  });
-
-   this.indexMemTweets = new Chart("indexMemTweets", {
-    type: 'bar',
-    data: {
-      labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-      datasets: [{
-        label: '# of Votes',
-        data: [12, 19, 3, 5, 2, 3],
-        borderWidth: 1
-      }]
-    },
-    options: {
-      scales: {
-        y: {
-          beginAtZero: true
-        }
-      }
-    }
-  });
-
-
-}
-
+    this.chart?.update();
+  }
 }

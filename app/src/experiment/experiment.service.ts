@@ -28,6 +28,7 @@ export class ExperimentService implements OnApplicationBootstrap {
     await this.placeholderSearchAll('articles');
     await this.placeholderSearchAll('tweets');
     await this.parseResults(version);
+    console.log('FINISHED EXPERIMENT ', version);
   }
 
   private async indexAll(collectionName: string) {

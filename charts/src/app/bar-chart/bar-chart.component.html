@@ -1,12 +1,13 @@
 
-<div class="chart-container">
-      <canvas  id="indexSpeedTweets" >{{ indexSpeedTweets }}</canvas>
+<div style="border: 2px blueviolet dotted; height: 50%">
+<canvas width="100%"  baseChart class="chart"
+        [data]="barChartData"
+        [options]="barChartOptions"
+        [plugins]="barChartPlugins"
+        [type]="barChartType"
+        (chartHover)="chartHovered($event)"
+        (chartClick)="chartClicked($event)">
+</canvas>
 </div>
+<button mat-button mat-raised-button color="primary" (click)="randomize()">Update</button>
 
-<div class="chart-container">
-      <canvas  id="indexCpuTweets" >{{ indexCpuTweets }}</canvas>
-</div>
-
-<div class="chart-container">
-      <canvas  id="indexMemTweets" >{{ indexMemTweets }}</canvas>
-</div>

@@ -23,6 +23,8 @@
       "ES2022",
       "dom",
     ],
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
