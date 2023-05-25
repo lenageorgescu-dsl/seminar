@@ -27,9 +27,7 @@ export class OverviewComponent {
       .get<any[]>(repoInfo) //GeneralData array
       .subscribe((data) =>{ console.log(data)
         this.initData = data.filter((s: any)=> s.operation == 'init');
-        console.log(this.initData);
-        this.storageData = data.filter((s)=> s.operation == 'index' || s.operaiton == 'init').map((s)=>({name: 'Storage', operation: s.operation, engine: s.engine, collection: s.collection, storage: s.storageMega}));
-        console.log(this.storageData);
+        this.storageData = data.filter((s)=> (s.operation == 'init' || s.operation == 'index')).map((s)=>({name: 'Storage', operation: s.operation, engine: s.engine, collection: s.collection, storage: s.storageMega}));
       })
   }
 
