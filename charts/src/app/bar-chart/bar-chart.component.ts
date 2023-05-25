@@ -41,7 +41,7 @@ export class BarChartComponent {
     scales: {
       x: {},
       y: {
-        min: 10
+        min: 10, grace: 1
       }
     },
     plugins: {
