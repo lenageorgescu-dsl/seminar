@@ -82,6 +82,10 @@ export abstract class SearchEngineService {
     try {
       const cpuStats: Array<number> = [];
       const memStats: Array<number> = [];
+      let containerData = await this.getContainerData(this.engineName);
+      cpuStats.push(containerData.cpuPercent);
+      memStats.push(containerData.memPercent);
+
       const intervalId = setIntervalAsync(async () => {
         const data = await this.getContainerData(this.engineName);
         cpuStats.push(data.cpuPercent);
@@ -91,6 +95,10 @@ export abstract class SearchEngineService {
       const hits = await this.multiMatchQuery(collectionName, keyword, fields);
       const endTime = Date.now();
       await clearIntervalAsync(intervalId);
+      containerData = await this.getContainerData(this.engineName);
+      cpuStats.push(containerData.cpuPercent);
+      memStats.push(containerData.memPercent);
+
       const data = JSON.stringify({
         experiment: this.experimentNumber,
         engine: this.engineName,
@@ -121,15 +129,23 @@ export abstract class SearchEngineService {
     try {
       const cpuStats: Array<number> = [];
       const memStats: Array<number> = [];
+      let containerData = await this.getContainerData(this.engineName);
+      cpuStats.push(containerData.cpuPercent);
+      memStats.push(containerData.memPercent);
+
       const intervalId = setIntervalAsync(async () => {
         const data = await this.getContainerData(this.engineName);
         cpuStats.push(data.cpuPercent);
         memStats.push(data.memPercent);
       }, 1);
+
       const startTime = Date.now();
       const hits = await this.boolQuery(collectionName, keyword, query);
       const endTime = Date.now();
       await clearIntervalAsync(intervalId);
+      containerData = await this.getContainerData(this.engineName);
+      cpuStats.push(containerData.cpuPercent);
+      memStats.push(containerData.memPercent);
       const data = JSON.stringify({
         experiment: this.experimentNumber,
         engine: this.engineName,
