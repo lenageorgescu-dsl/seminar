@@ -10,7 +10,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { LayoutModule } from '@angular/cdk/layout';
 import { NgChartsModule } from 'ng2-charts';
-
+import {MatToolbarModule} from '@angular/material/toolbar';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BarChartComponent } from './bar-chart/bar-chart.component';
@@ -46,6 +46,7 @@ import { StorageComponent } from './storage/storage.component';
     MatDialogModule,
     LayoutModule,
     NgChartsModule,
+    MatToolbarModule
   ],
   providers: [],
   bootstrap: [AppComponent],

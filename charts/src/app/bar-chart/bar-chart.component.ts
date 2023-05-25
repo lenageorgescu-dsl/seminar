@@ -1,10 +1,4 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { switchMap, zipAll } from 'rxjs/operators';
-import { BreakpointObserver } from '@angular/cdk/layout';
-import { BehaviorSubject } from 'rxjs';
-import { MatDialog } from '@angular/material/dialog';
-//import { DialogChartsComponent } from '../dialog-charts/dialog-charts.component';
-import { HttpClient } from '@angular/common/http';
+import { Component, Input, ViewChild } from '@angular/core';
 import { ChartConfiguration, ChartData, ChartEvent, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 
