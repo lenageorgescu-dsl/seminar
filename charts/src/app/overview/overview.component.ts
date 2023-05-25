@@ -20,6 +20,8 @@ export class OverviewComponent {
 
   initData: any[] = [];
   storageData: any[]=[];
+  indexData: any[]=[];
+  placeholderSearchData: any[] = [];
 
   async ngOnInit(): Promise<void> {
     const repoInfo = 'assets/1_experiment.json';
@@ -28,11 +30,17 @@ export class OverviewComponent {
       .subscribe((data) =>{ console.log(data)
         this.initData = data.filter((s: any)=> s.operation == 'init');
         this.storageData = data.filter((s)=> (s.operation == 'init' || s.operation == 'index')).map((s)=>({name: 'Storage', operation: s.operation, engine: s.engine, collection: s.collection, storage: s.storageMega}));
+        this.indexData = data.filter((s)=> s.operation == 'index');
+        this.placeholderSearchData = data.filter((s)=> s.operation == ('placeholderSearch'));
       })
   }
 
   toggleStorage(){
     this.hideStorage = !this.hideStorage;
+  }
+
+  toggleSpeed(){
+    this.hideSpeed = !this.hideSpeed;
   }
 
 }

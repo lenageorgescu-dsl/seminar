@@ -1,1 +1,13 @@
-<mat-toolbar></mat-toolbar>
+<p>
+  <mat-toolbar>
+    <span>Speed</span>
+  </mat-toolbar>
+</p>
+<div id = 'searchCharts'>
+  <div id = 'placeholderSearch'>
+<app-bar-chart></app-bar-chart></div>
+  </div>
+
+<div id ='indexChart'>
+<app-bar-chart [inputData]='indexBarData'></app-bar-chart>
+</div>

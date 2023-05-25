@@ -25,8 +25,7 @@ export class StorageComponent {
     const tweetData = this.filterService.getTweets(this.data);
     const articleData = this.filterService.getArticles(this.data);
     const init = this.data.filter((s)=> s.operation == 'init');
-    const data = [{data: this.getStorageNumbers(init), label: 'Init'},{data: this.getStorageNumbers(tweetData), label: 'Tweets'},{data: this.getStorageNumbers(articleData), label: 'Articles'},]
-
+    const data = [{data: this.filterService.getNumbers(init, 'storage'), label: 'Init'},{data: this.filterService.getNumbers(tweetData, 'storage'), label: 'Tweets'},{data: this.filterService.getNumbers(articleData, 'storage'), label: 'Articles'},]
 
     const res: barChartInput = {
       title: 'Storage',
@@ -34,15 +33,6 @@ export class StorageComponent {
       datasets: data
     }
     return res;
-  }
-
-
-  getStorageNumbers(data: any): number[]{
-    if (data.length != 3)throw new Error("invalid input")
-    const num1 = this.filterService.getElastic(data).storage;
-    const num2 = this.filterService.getMeili(data).storage;
-    const num3 = this.filterService.getTypesense(data).storage;
-    return [num1, num2, num3];
   }
 
 
