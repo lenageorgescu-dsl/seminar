@@ -27,9 +27,10 @@ export class BarChartComponent {
 
    ngOnChanges(){
     this.barChartOptions!.plugins!.title!.text= this.inputData.title;
+    console.log (this.barChartOptions!.plugins!.title!.text)
     this.barChartData.labels = this.inputData.labels;
     this.barChartData.datasets = this.inputData.datasets;
-    this.chart?.update;
+    this.update();
    }
 
    @ViewChild(BaseChartDirective) chart: BaseChartDirective | undefined;
@@ -79,17 +80,8 @@ export class BarChartComponent {
     //console.log(event, active);
   }
 
-  public randomize(): void {
-    // Only Change 3 values
-    this.barChartData.datasets[0].data = [
-      Math.round(Math.random() * 100),
-      59,
-      80,
-      Math.round(Math.random() * 100),
-      56,
-      Math.round(Math.random() * 100),
-      40 ];
-
-    this.chart?.update();
+  public update(){
+    this.chart?.ngOnChanges({});
   }
+
 }
