@@ -151,7 +151,7 @@ export abstract class SearchEngineService {
         engine: this.engineName,
         operation: 'boolQuerySearch',
         collection: collectionName,
-        boolQuery: query,
+        boolQuery: this.stringifyBoolQuery(query, 'AND', 'OR', ' = '),
         hits: hits,
         startTime,
         endTime,
