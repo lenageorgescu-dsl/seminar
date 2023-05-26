@@ -25,12 +25,24 @@ export class StorageComponent {
     const tweetData = this.filterService.getTweets(this.data);
     const articleData = this.filterService.getArticles(this.data);
     const init = this.data.filter((s)=> s.operation == 'init');
-    const data = [{data: this.filterService.getNumbers(init, 'storage'), label: 'Init'},{data: this.filterService.getNumbers(tweetData, 'storage'), label: 'Tweets'},{data: this.filterService.getNumbers(articleData, 'storage'), label: 'Articles'},]
+    const data1 = this.filterService.getNumbers(init, 'storage');;
+    const data2 = this.filterService.getNumbers(tweetData, 'storage');
+    const data3 = this.filterService.getNumbers(articleData, 'storage')
+    const data4 = this.aggregateData (data1, data2, data3);
+    const data = [{data: data1, label: 'Init'},{data: data2, label: 'Tweets'},{data: data3, label: 'Articles'},{data: data4, label: 'Total'}]
 
     const res: barChartInput = {
       title: 'Storage',
       labels: defaultLabels,
       datasets: data
+    }
+    return res;
+  }
+
+  private aggregateData(arr1: number[], arr2: number[], arr3: number[]): number[]{
+    let res = []
+    for (let i = 0; i < 3; i++){
+      res[i]= arr1[i] + arr2[i] + arr3[i];
     }
     return res;
   }
