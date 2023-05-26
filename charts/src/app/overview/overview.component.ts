@@ -19,10 +19,19 @@ export class OverviewComponent {
   memKey = 'mem';
   memName = 'Memory'
 
+  speedKey= 'running';
+  speedName= '-Speed in Milliseconds'
+  speedTitle = 'Speed'
+
+  hitKey='hits'
+  hitName='-Hits'
+  hitTitle = 'Hits'
+
   hideMemory = true;
   hideCpu = true;
   hideSpeed = true;
   hideStorage = true;
+  hideHits = true;
 
   initData: any[] = [];
   storageData: any[]=[];
@@ -64,11 +73,17 @@ export class OverviewComponent {
     this.hideMemory = false;
   }
 
+  openHits(){
+    this.closeAll();
+    this.hideHits = false;
+  }
+
   private closeAll(){
     this.hideCpu = true;
     this.hideMemory = true;
     this.hideSpeed = true;
     this.hideStorage = true;
+    this.hideHits = true;
   }
 
 }

@@ -75,7 +75,7 @@ export class MeiliService extends SearchEngineService {
   ) {
     const newQuery = this.stringifyBoolQuery(query, 'AND', 'OR', ' = ');
     const res = await this.client.index(collectionName).search('', {
-      filter: newQuery,
+      filter: "text = 'run for president' AND text = 2028",
     });
     return res.estimatedTotalHits;
   }

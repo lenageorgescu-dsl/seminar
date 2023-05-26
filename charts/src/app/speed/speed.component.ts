@@ -10,6 +10,9 @@ import { FilterService } from '../filter.service';
 export class SpeedComponent {
 
 
+  @Input() key: string = ''
+  @Input() name: string = ''
+  @Input() title: string = ''
 
   @Input() indexData: any[]=[]
   @Input() placeholderData: any[]=[]
@@ -29,17 +32,15 @@ export class SpeedComponent {
     this.placeholderBarData = this.parseSmallerData(this.placeholderData, 'PlaceholderSearch');
     this.keywordTweetBarData = this.parseBiggerDataTweets(this.keywordData, 'KeyWordSearch')
     this.keywordArticleBarData = this.parseBiggerDataArticles(this.keywordData, 'KeyWordSearch')
-    
-
   }
 
 
   parseSmallerData(input: any, title: string): barChartInput{
     const tweetData = this.filterService.getTweets(input);
     const articleData = this.filterService.getArticles(input);
-    const data = [{data: this.filterService.getNumbers(tweetData, 'running'), label: 'Tweets'},{data: this.filterService.getNumbers(articleData, 'running'), label: 'Articles'},]
+    const data = [{data: this.filterService.getNumbers(tweetData, this.key), label: 'Tweets'},{data: this.filterService.getNumbers(articleData, this.key), label: 'Articles'},]
     const res: barChartInput = {
-      title: `${title}-Speed in MilliSeconds`,
+      title: `${title}${this.name}`,
       labels: defaultLabels,
       datasets: data
     }
@@ -50,9 +51,9 @@ export class SpeedComponent {
     const data = this.filterService.getTweets(input);
     const tesla = data.filter((s)=> s.keyword == 'Tesla');
     const goodnight = data.filter((s)=> s.keyword != 'Tesla');
-    const res = [{data: this.filterService.getNumbers(tesla, 'running'), label: 'Tesla'},{data: this.filterService.getNumbers(goodnight, 'running'), label: '@elonmusk good night from Nigeria'},]
+    const res = [{data: this.filterService.getNumbers(tesla, this.key), label: 'Tesla'},{data: this.filterService.getNumbers(goodnight, this.key), label: '@elonmusk good night from Nigeria'},]
     const result: barChartInput = {
-      title: `${title}-Speed in MilliSeconds, Tweet-Collection`,
+      title: `${title}${this.name}, Tweet-Collection`,
       labels: defaultLabels,
       datasets: res
     }
@@ -63,9 +64,9 @@ export class SpeedComponent {
     const data = this.filterService.getArticles(input);
     const markets = data.filter((s)=> s.keyword == 'Markets');
     const longer = data.filter((s)=> s.keyword != 'Markets');
-    const res = [{data: this.filterService.getNumbers(markets, 'running'), label: 'Markets'},{data: this.filterService.getNumbers(longer, 'running'), label: '2019 Size, Share, Growth, Demand, Analysis...'},]
+    const res = [{data: this.filterService.getNumbers(markets, this.key), label: 'Markets'},{data: this.filterService.getNumbers(longer, this.key), label: '2019 Size, Share, Growth, Demand, Analysis...'},]
     const result: barChartInput = {
-      title: `${title}-Speed in MilliSeconds, Article-Collection`,
+      title: `${title}${this.name}, Article-Collection`,
       labels: defaultLabels,
       datasets: res
     }
