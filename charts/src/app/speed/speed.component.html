@@ -3,11 +3,14 @@
     <span>Speed</span>
   </mat-toolbar>
 </p>
+<div id ='indexChart'>
+<app-bar-chart [inputData]='indexBarData'></app-bar-chart>
+</div>
 <div id = 'searchCharts'>
   <div id = 'placeholderSearch'>
 <app-bar-chart [inputData]='placeholderBarData'></app-bar-chart></div>
   </div>
-
-<div id ='indexChart'>
-<app-bar-chart [inputData]='indexBarData'></app-bar-chart>
+  <div id = 'keywordSearch'>
+<app-bar-chart [inputData]='keywordTweetBarData'></app-bar-chart>
+<app-bar-chart [inputData]="keywordArticleBarData"></app-bar-chart>
 </div>

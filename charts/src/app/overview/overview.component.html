@@ -2,7 +2,7 @@
 <button mat-button mat-raised-button color="primary" (click)="openStorage()">Storage</button>
 <button mat-button mat-raised-button color="primary" (click)="openCpu()">CPU</button>
 <button mat-button mat-raised-button color="primary" (click)="openMemory()">Memory</button>
-<app-cpu [hidden]='hideCpu' [indexData]="indexData" [placeholderData]="placeholderSearchData" [key]="cpuKey" [name]="cpuName"></app-cpu>
-<app-cpu [hidden]='hideMemory' [key]="memKey" [name]="memName" [indexData]="indexData" [placeholderData]="placeholderSearchData"></app-cpu>
-<app-speed [hidden]='hideSpeed' [indexData]="indexData" [placeholderData]="placeholderSearchData"></app-speed>
+<app-cpu [hidden]='hideCpu' [indexData]="indexData" [placeholderData]="placeholderSearchData" [keywordData]="keyWordSearchData" [key]="cpuKey" [name]="cpuName"></app-cpu>
+<app-cpu [hidden]='hideMemory' [key]="memKey" [name]="memName" [indexData]="indexData" [placeholderData]="placeholderSearchData" [keywordData]="keyWordSearchData"></app-cpu>
+<app-speed [hidden]='hideSpeed' [indexData]="indexData" [placeholderData]="placeholderSearchData" [keywordData]="keyWordSearchData"></app-speed>
 <app-storage [hidden]='hideStorage' [data]="storageData"> </app-storage>

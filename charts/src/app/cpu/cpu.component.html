@@ -3,7 +3,31 @@
     <span>{{name}}</span>
   </mat-toolbar>
 </p>
+<p>
+  Index
+</p>
+<div id="index">
 <app-line-chart [inputData]="indexLineDataTweets"></app-line-chart>
 <app-line-chart [inputData]="indexLineDataArticles"></app-line-chart>
-<app-line-chart [inputData]="placeholderLineDataTweets"></app-line-chart>
-<app-line-chart [inputData]="placeholderLineDataArticles"></app-line-chart>
+</div>
+<div id="search">
+  <p>
+    PlaceholderSearch
+  </p>
+  <div id="placeholderSearch">
+  <app-line-chart [inputData]="placeholderLineDataTweets"></app-line-chart>
+  <app-line-chart [inputData]="placeholderLineDataArticles"></app-line-chart>
+  </div>
+  <p>KeywordSearch</p>
+  <div id ="keyWordSearch">
+    <p>
+      Tweets
+    </p>
+  <app-line-chart [inputData]="keywordLineDataTweetsTesla"></app-line-chart>
+  <app-line-chart [inputData]="keywordLineDataTweetsGoodnight"></app-line-chart>
+  <p>Articles</p>
+  <app-line-chart [inputData]="keywordLineDataArticlesMarkets"></app-line-chart>
+  <app-line-chart [inputData]="keywordLineDataArticlesLonger"></app-line-chart>
+  </div>
+
+</div>

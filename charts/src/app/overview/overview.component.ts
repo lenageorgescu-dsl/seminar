@@ -28,9 +28,10 @@ export class OverviewComponent {
   storageData: any[]=[];
   indexData: any[]=[];
   placeholderSearchData: any[] = [];
+  keyWordSearchData: any[]=[];
 
   async ngOnInit(): Promise<void> {
-    const repoInfo = 'assets/2_experiment.json';
+    const repoInfo = 'assets/5_experiment.json';
      const data = this.http
       .get<any[]>(repoInfo) //GeneralData array
       .subscribe((data) =>{
@@ -39,6 +40,7 @@ export class OverviewComponent {
         this.storageData = data.filter((s)=> (s.operation == 'init' || s.operation == 'index')).map((s)=>({name: 'Storage', operation: s.operation, engine: s.engine, collection: s.collection, storage: s.storageMega}));
         this.indexData = data.filter((s)=> s.operation == 'index');
         this.placeholderSearchData = data.filter((s)=> s.operation == ('placeholderSearch'));
+        this.keyWordSearchData = data.filter((s)=> s.operation == ('keywordSearch'));
       })
   }
 
