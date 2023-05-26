@@ -5,7 +5,7 @@ export type barChartInput = {
 }
 
 export type barChartNumbers = {
-    data: number[], label: string
+    data: number[], label: string, backgroundColor?: string
 }
 
 export type lineChartInput = {
