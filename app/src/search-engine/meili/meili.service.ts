@@ -12,12 +12,12 @@ export class MeiliService extends SearchEngineService {
 
   protected override async createCollection(collectionName: string, data: any) {
     await this.taskAlreadyExists(collectionName);
+    const fields = this.getAllKeys(data);
+    await this.reindex(collectionName, fields);
     const enquededTask = await this.client
       .index(collectionName)
       .addDocuments(data);
     await this.checkStatus(enquededTask.taskUid);
-    const fields = this.getAllKeys(data);
-    await this.reindex(collectionName, fields);
   }
 
   private async taskAlreadyExists(collectionName: string) {
