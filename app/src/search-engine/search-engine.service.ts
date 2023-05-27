@@ -329,6 +329,7 @@ export abstract class SearchEngineService {
       memStats.push(data.memPercent);
       timeStats.push(timeNow - start);
     }, 5);
+    await this.sleep();
     return {
       cpu: cpuStats,
       mem: memStats,
@@ -338,8 +339,8 @@ export abstract class SearchEngineService {
   }
 
   private async tearDownInterval(intervalId: any): Promise<void> {
-    await this.sleep();
     clearInterval(intervalId);
+    await this.sleep();
   }
 
   private async sleep() {
