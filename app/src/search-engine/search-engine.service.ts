@@ -322,14 +322,13 @@ export abstract class SearchEngineService {
     const memStats: Array<number> = [];
     const timeStats: Array<number> = [];
     const start = Date.now();
-    const intervalId = setIntervalAsync(async () => {
+    const intervalId = setInterval(async () => {
       const data = await this.getContainerData(this.engineName);
       const timeNow = Date.now();
       cpuStats.push(data.cpuPercent);
       memStats.push(data.memPercent);
       timeStats.push(timeNow - start);
-    }, interval);
-    await this.sleep();
+    }, 5);
     return {
       cpu: cpuStats,
       mem: memStats,
@@ -340,11 +339,11 @@ export abstract class SearchEngineService {
 
   private async tearDownInterval(intervalId: any): Promise<void> {
     await this.sleep();
-    await clearIntervalAsync(intervalId);
+    clearInterval(intervalId);
   }
 
   private async sleep() {
-    await new Promise((r) => setTimeout(r, 6000));
+    await new Promise((r) => setTimeout(r, 2100));
   }
 
   private loadData(path: string) {
