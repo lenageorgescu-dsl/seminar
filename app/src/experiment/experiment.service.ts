@@ -99,17 +99,98 @@ export class ExperimentService implements OnApplicationBootstrap {
   }
 
   public compileResults(from: number, to: number) {
-    const data: Array<string> = [];
+    const data: Array<any[]> = [];
     for (let i = from; i <= to; i++) {
-      const res = JSON.parse(
+      const res: any[] = JSON.parse(
         readFileSync(
-          `${ExperimentService.getResultPath()}${i}_experiment`,
+          `${ExperimentService.getResultPath()}${i}_experiment.json`,
           'utf-8',
         ),
       );
       data.push(res);
     }
-    //TODO: compute median
+    const res: any[] = [];
+    data[0].forEach((s) => {
+      const t = this.findMatches(s, data);
+      const aggregate = this.aggregateMatches(t);
+      res.push(aggregate);
+    });
+    const title = `${from}-${to}`;
+    writeFileSync(
+      `${ExperimentService.getResultPath()}${title}_experiment_suite.json`,
+      JSON.stringify(res),
+    );
+    console.log('FINISHED');
+  }
+
+  private findMatches(element: any, jsons: any[][]): any[] {
+    const matches: any[] = [element];
+    for (let i = 1; i < jsons.length; i++) {
+      const res = jsons[i]
+        .filter(
+          (s) =>
+            s.engine == element.engine &&
+            s.operation == element.operation &&
+            s.keyword == element.keyword &&
+            s.boolQuery == element.boolQuery,
+        )
+        .pop();
+      matches.push(res);
+    }
+    return matches;
+  }
+
+  private aggregateMatches(matches: any[]): any {
+    const res: any = matches[0];
+    const relevantKeys: string[] = [];
+    for (const key in matches[0]) {
+      if (typeof matches[0][key] != 'string') relevantKeys.push(key);
+    }
+    console.log(relevantKeys);
+    relevantKeys.forEach((s) => {
+      const numberArr: any[] = [];
+      for (let i = 0; i < matches.length; i++) {
+        numberArr.push(matches[i][s]);
+      }
+      if (typeof numberArr[0] == 'number') res[s] = this.median(numberArr);
+      else res[s] = this.medianArray(numberArr);
+    });
+    console.log('RESULT: ', res);
+    return res;
+  }
+
+  private median(arr: number[]): number {
+    arr = arr.filter((s) => s != undefined);
+    if (arr.length == 0) {
+      return; // 0.
+    }
+    arr.sort((a, b) => a - b); // 1.
+    const midpoint = Math.floor(arr.length / 2); // 2.
+    const median =
+      arr.length % 2 === 1
+        ? arr[midpoint] // 3.1. If odd length, just take midpoint
+        : (arr[midpoint - 1] + arr[midpoint]) / 2; // 3.2. If even length, take median of midpoints
+    return median;
+  }
+
+  private medianArray(arr: number[][]): number[] {
+    const resArr: number[] = [];
+    if (arr.length == 0) {
+      return; // 0.
+    }
+    let maxLength = 0;
+    for (let i = 0; i < arr.length; i++) {
+      if (arr[i].length > maxLength) maxLength = arr[i].length;
+    }
+    for (let i = 0; i < maxLength; i++) {
+      const numberArr: number[] = [];
+      for (let j = 0; j < arr.length; j++) {
+        numberArr.push(arr[j][i]);
+      }
+      const res = this.median(numberArr);
+      resArr.push(res);
+    }
+    return resArr;
   }
 
   public static getResultPath(): string {

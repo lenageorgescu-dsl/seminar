@@ -76,7 +76,7 @@ export class ExperimentController {
     return 'Experiment Controller finished';
   }
 
-  @Get(':from/:to')
+  @Get('compile/:from/:to')
   compileResults(@Param('from') from: number, @Param('to') to: number) {
     this.experiment.compileResults(from, to);
     return 'Compiling results finished';
