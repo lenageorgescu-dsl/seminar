@@ -44,7 +44,7 @@ export class FilterService {
     return [num1, num2, num3];
   }
 
-  getxLabels(arr: number[][]): number[]{
+  getxLabels(arr: number[][]): string[]{
      if (arr.length != 3)throw new Error("invalid input");
      let max = 0;
      for (let i = 0; i < arr.length; i++){
@@ -52,7 +52,7 @@ export class FilterService {
      }
      let res = [];
      for( let i = 0; i < max; i++){
-      res.push(2*i);
+      res.push('');
      }
      return res;
   }

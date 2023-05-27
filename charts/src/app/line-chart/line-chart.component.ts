@@ -67,7 +67,7 @@ export class LineChartComponent {
         fill: 'origin',
       }
     ],
-    labels: [ '']
+    labels: [''],
   };
 
   public lineChartOptions: ChartConfiguration['options'] = {
@@ -82,6 +82,9 @@ export class LineChartComponent {
         {
           position: 'left',
         },
+      x: {
+        title: {display: true, text: 'time', align: 'end'}
+      }
     },
 
     plugins: {
