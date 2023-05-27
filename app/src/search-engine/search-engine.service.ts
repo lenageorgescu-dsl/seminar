@@ -10,6 +10,13 @@ export type BoolQuery = {
   or: any[];
 };
 
+export type cpuStats = {
+  cpu: Array<number>;
+  mem: Array<number>;
+  cpuTime: Array<number>;
+  intervalId: any;
+};
+
 @Injectable()
 export abstract class SearchEngineService {
   protected engineName: string;
@@ -37,13 +44,17 @@ export abstract class SearchEngineService {
       const data = this.loadData(`../app/assets/data/${collectionName}.json`);
       const cpuStats: Array<number> = [];
       const memStats: Array<number> = [];
+      const timeStats: Array<number> = [];
+      const cpuStart = Date.now();
       let containerData = await this.getContainerData(this.engineName);
       cpuStats.push(containerData.cpuPercent);
       memStats.push(containerData.memPercent);
+      timeStats.push(Date.now() - cpuStart);
       const intervalId = setIntervalAsync(async () => {
         const data = await this.getContainerData(this.engineName);
         cpuStats.push(data.cpuPercent);
         memStats.push(data.memPercent);
+        timeStats.push(Date.now() - cpuStart);
       }, 500);
       const storageBefore = await this.getStorage();
       const startTime = Date.now();
@@ -53,6 +64,7 @@ export abstract class SearchEngineService {
       containerData = await this.getContainerData(this.engineName);
       cpuStats.push(containerData.cpuPercent);
       memStats.push(containerData.memPercent);
+      timeStats.push(Date.now() - cpuStart);
       const storageAfter = await this.getStorage();
       const res = JSON.stringify({
         experiment: this.experimentNumber,
@@ -64,6 +76,7 @@ export abstract class SearchEngineService {
         running: endTime - startTime,
         memPercent: memStats,
         cpuPercent: cpuStats,
+        cpuTime: timeStats,
         storageMega: storageAfter - storageBefore,
       });
       console.log('INDEX: ');
@@ -80,25 +93,11 @@ export abstract class SearchEngineService {
     fields: string[],
   ) {
     try {
-      const cpuStats: Array<number> = [];
-      const memStats: Array<number> = [];
-      const intervalId = setIntervalAsync(async () => {
-        const data = await this.getContainerData(this.engineName);
-        cpuStats.push(data.cpuPercent);
-        memStats.push(data.memPercent);
-      }, 1);
-      await this.getContainerData(this.engineName);
-      await this.getContainerData(this.engineName);
+      const intervalStats = await this.setUpInterval(1);
       const startTime = Date.now();
       const hits = await this.multiMatchQuery(collectionName, keyword, fields);
       const endTime = Date.now();
-      await this.getContainerData(this.engineName);
-      await this.getContainerData(this.engineName);
-      await clearIntervalAsync(intervalId);
-      const containerData = await this.getContainerData(this.engineName);
-      cpuStats.push(containerData.cpuPercent);
-      memStats.push(containerData.memPercent);
-
+      await this.tearDownInterval(intervalStats.intervalId);
       const data = JSON.stringify({
         experiment: this.experimentNumber,
         engine: this.engineName,
@@ -110,8 +109,9 @@ export abstract class SearchEngineService {
         startTime,
         endTime,
         running: endTime - startTime,
-        memPercent: memStats,
-        cpuPercent: cpuStats,
+        memPercent: intervalStats.mem,
+        cpuPercent: intervalStats.cpu,
+        cpuTime: intervalStats.cpuTime,
       });
       console.log('KEYWORDSEARCH: ');
       console.log(data);
@@ -127,25 +127,11 @@ export abstract class SearchEngineService {
     query: BoolQuery,
   ) {
     try {
-      const cpuStats: Array<number> = [];
-      const memStats: Array<number> = [];
-      let containerData = await this.getContainerData(this.engineName);
-      cpuStats.push(containerData.cpuPercent);
-      memStats.push(containerData.memPercent);
-
-      const intervalId = setIntervalAsync(async () => {
-        const data = await this.getContainerData(this.engineName);
-        cpuStats.push(data.cpuPercent);
-        memStats.push(data.memPercent);
-      }, 1);
-
+      const intervalStats = await this.setUpInterval(1);
       const startTime = Date.now();
       const hits = await this.boolQuery(collectionName, keyword, query);
       const endTime = Date.now();
-      await clearIntervalAsync(intervalId);
-      containerData = await this.getContainerData(this.engineName);
-      cpuStats.push(containerData.cpuPercent);
-      memStats.push(containerData.memPercent);
+      await this.tearDownInterval(intervalStats.intervalId);
       const data = JSON.stringify({
         experiment: this.experimentNumber,
         engine: this.engineName,
@@ -156,8 +142,9 @@ export abstract class SearchEngineService {
         startTime,
         endTime,
         running: endTime - startTime,
-        memPercent: memStats,
-        cpuPercent: cpuStats,
+        memPercent: intervalStats.mem,
+        cpuPercent: intervalStats.cpu,
+        cpuTime: intervalStats.cpuTime,
       });
       console.log('FACETED SEARCH: ');
       console.log(data);
@@ -167,38 +154,13 @@ export abstract class SearchEngineService {
     }
   }
 
-  protected boolQuery(
-    collectionName: string,
-    keyword: string,
-    query: BoolQuery,
-  ) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve('boolQuery');
-      }, 5000);
-    });
-  }
-
   public async placeholderSearch(collectionName: string) {
     try {
-      const cpuStats: Array<number> = [];
-      const memStats: Array<number> = [];
-      let containerData = await this.getContainerData(this.engineName);
-      cpuStats.push(containerData.cpuPercent);
-      memStats.push(containerData.memPercent);
-      const intervalId = setIntervalAsync(async () => {
-        const data = await this.getContainerData(this.engineName);
-        cpuStats.push(data.cpuPercent);
-        memStats.push(data.memPercent);
-      }, 1);
+      const intervalStats = await this.setUpInterval(1);
       const startTime = Date.now();
       const hits = await this.placeholderQuery(collectionName);
       const endTime = Date.now();
-      await clearIntervalAsync(intervalId);
-      containerData = await this.getContainerData(this.engineName);
-      cpuStats.push(containerData.cpuPercent);
-      memStats.push(containerData.memPercent);
-
+      await this.tearDownInterval(intervalStats.intervalId);
       const data = JSON.stringify({
         experiment: this.experimentNumber,
         engine: this.engineName,
@@ -208,8 +170,9 @@ export abstract class SearchEngineService {
         startTime,
         endTime,
         running: endTime - startTime,
-        memPercent: memStats,
-        cpuPercent: cpuStats,
+        memPercent: intervalStats.mem,
+        cpuPercent: intervalStats.cpu,
+        cpuTime: intervalStats.cpuTime,
       });
       console.log('PLACEHOLDERSEARCH: ');
       console.log(data);
@@ -226,6 +189,19 @@ export abstract class SearchEngineService {
       }, 5000);
     });
   }
+
+  protected boolQuery(
+    collectionName: string,
+    keyword: string,
+    query: BoolQuery,
+  ) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve('boolQuery');
+      }, 5000);
+    });
+  }
+
   private async getStorage() {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const exec = promisify(require('node:child_process').exec);
@@ -339,6 +315,36 @@ export abstract class SearchEngineService {
     }
 
     return a;
+  }
+
+  private async setUpInterval(interval: number): Promise<cpuStats> {
+    const cpuStats: Array<number> = [];
+    const memStats: Array<number> = [];
+    const timeStats: Array<number> = [];
+    const start = Date.now();
+    const intervalId = setIntervalAsync(async () => {
+      const data = await this.getContainerData(this.engineName);
+      const timeNow = Date.now();
+      cpuStats.push(data.cpuPercent);
+      memStats.push(data.memPercent);
+      timeStats.push(timeNow - start);
+    }, interval);
+    await this.sleep();
+    return {
+      cpu: cpuStats,
+      mem: memStats,
+      cpuTime: timeStats,
+      intervalId: intervalId,
+    };
+  }
+
+  private async tearDownInterval(intervalId: any): Promise<void> {
+    await this.sleep();
+    await clearIntervalAsync(intervalId);
+  }
+
+  private async sleep() {
+    await new Promise((r) => setTimeout(r, 6000));
   }
 
   private loadData(path: string) {

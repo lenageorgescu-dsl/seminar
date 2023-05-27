@@ -33,6 +33,7 @@
     "axios": "^1.4.0",
     "dockerstats": "^2.4.1",
     "meilisearch": "^0.32.3",
+    "nanotimer": "^0.3.15",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0",
     "set-interval-async": "^3.0.3",
