@@ -82,20 +82,20 @@ export abstract class SearchEngineService {
     try {
       const cpuStats: Array<number> = [];
       const memStats: Array<number> = [];
-      let containerData = await this.getContainerData(this.engineName);
-      cpuStats.push(containerData.cpuPercent);
-      memStats.push(containerData.memPercent);
-
       const intervalId = setIntervalAsync(async () => {
         const data = await this.getContainerData(this.engineName);
         cpuStats.push(data.cpuPercent);
         memStats.push(data.memPercent);
       }, 1);
+      await this.getContainerData(this.engineName);
+      await this.getContainerData(this.engineName);
       const startTime = Date.now();
       const hits = await this.multiMatchQuery(collectionName, keyword, fields);
       const endTime = Date.now();
+      await this.getContainerData(this.engineName);
+      await this.getContainerData(this.engineName);
       await clearIntervalAsync(intervalId);
-      containerData = await this.getContainerData(this.engineName);
+      const containerData = await this.getContainerData(this.engineName);
       cpuStats.push(containerData.cpuPercent);
       memStats.push(containerData.memPercent);
 
