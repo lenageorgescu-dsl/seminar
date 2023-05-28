@@ -19,15 +19,29 @@ export class SearchService {
     // await this.elastic.boolQuerySearch('tweets', 'president', {
     //   and: [],
     // });
-    await this.elastic.boolQuerySearch('tweets', 'Food', 'text', {
-      and: [{ text: '@elonmusk No fast food?' }],
+    await this.typesense.boolQuerySearch('tweets', 'Eisenhower', 'text', {
+      and: [
+        {
+          text: "@Geek4MAGA @elonmusk @LegendaryEnergy @EndWokeness Don't forget Eisenhower warned us too!",
+        },
+      ],
     });
-    // await this.typesense.boolQuerySearch('tweets', 'food', 'text', {
-    //   and: [{ text: '@elonmusk No fast food?' }],
-    // });
-    // await this.meili.boolQuerySearch('tweets', 'food', 'text', {
-    //   and: [{ text: '@elonmusk No fast food?' }],
-    // });
+    await this.meili.boolQuerySearch('tweets', 'Eisenhower', 'text', {
+      and: [
+        {
+          text: "@Geek4MAGA @elonmusk @LegendaryEnergy @EndWokeness Don't forget Eisenhower warned us too!",
+        },
+      ],
+    });
+
+    await this.elastic.boolQuerySearch('tweets', 'Eisenhower', 'text', {
+      and: [
+        {
+          text: "@Geek4MAGA @elonmusk @LegendaryEnergy @EndWokeness Don't forget Eisenhower warned us too!",
+        },
+      ],
+    });
+
     // await this.elastic.boolQuerySearch('tweets', 'nigeria', 'text', {
     //   and: [{ text: 'tesla' }],
     // });

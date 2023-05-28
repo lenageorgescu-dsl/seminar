@@ -4,6 +4,7 @@ import { MeiliService } from '../search-engine/meili/meili.service';
 import { ElasticService } from '../search-engine/elastic/elastic.service';
 import { TypesenseService } from '../search-engine/typesense/typesense.service';
 import { readFileSync, unlink, writeFileSync } from 'fs';
+import { BoolQuery } from '../search-engine/search-engine.service';
 
 @Injectable()
 export class ExperimentService implements OnApplicationBootstrap {
@@ -37,6 +38,16 @@ export class ExperimentService implements OnApplicationBootstrap {
       ['description'],
     );
     await this.keywordSearchAll('articles', 'Markets', ['description']);
+    await this.boolQuerySearchAll('tweets', 'Eisenhower', 'text', {
+      and: [
+        {
+          text: "@Geek4MAGA @elonmusk @LegendaryEnergy @EndWokeness Don't forget Eisenhower warned us too!",
+        },
+      ],
+    });
+    await this.boolQuerySearchAll('tweets', 'Obama', 'text', {
+      and: [{ text: '@MrAndyNgo @elonmusk Thanks Obama' }],
+    });
 
     await this.parseResults(version);
     console.log('FINISHED EXPERIMENT ', version);
@@ -56,6 +67,17 @@ export class ExperimentService implements OnApplicationBootstrap {
     await this.typesense.keywordSearch(collectionName, keyword, fields);
     await this.meili.keywordSearch(collectionName, keyword, fields);
     await this.elastic.keywordSearch(collectionName, keyword, fields);
+  }
+
+  private async boolQuerySearchAll(
+    collectionName: string,
+    keyword: string,
+    field: string,
+    query: BoolQuery,
+  ) {
+    await this.typesense.boolQuerySearch(collectionName, keyword, field, query);
+    await this.typesense.boolQuerySearch(collectionName, keyword, field, query);
+    await this.typesense.boolQuerySearch(collectionName, keyword, field, query);
   }
 
   private async placeholderSearchAll(collectionName: string) {

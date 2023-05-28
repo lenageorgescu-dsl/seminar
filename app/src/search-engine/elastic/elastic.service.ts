@@ -51,7 +51,6 @@ export class ElasticService extends SearchEngineService {
       index: collectionName,
       query: boolquery,
     });
-    console.log(result);
     return (result as undefined as any).hits.total.value;
   }
 

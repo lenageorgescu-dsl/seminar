@@ -281,7 +281,7 @@ export abstract class SearchEngineService {
       res += key;
       res += equals;
       let word = query.and[i][key];
-      if (quotationMark && this.hasWhiteSpace(word)) word = "'" + word + "'";
+      if (quotationMark && this.hasWhiteSpace(word)) word = '"' + word + '"'; //TODO: make this more concrete
       res += word;
     }
     console.log(res);
