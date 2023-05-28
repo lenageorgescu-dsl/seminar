@@ -71,14 +71,18 @@ export class MeiliService extends SearchEngineService {
   protected override async boolQuery(
     collectionName: string,
     keyword: string,
+    field: string,
     query: BoolQuery,
   ) {
-    const newQuery = this.stringifyBoolQuery(query, 'AND', 'OR', ' = ', true);
-    const res = await this.client.index(collectionName).search('', {
+    const newQuery = this.stringifyBoolQuery(query, 'AND', ' != ', true);
+    const res = await this.client.index(collectionName).search(keyword, {
       filter: newQuery,
     });
+    console.log(res);
     return res.estimatedTotalHits;
   }
+
+  // TODO add multi match
 
   private async reindex(collectionName: string, fields: string[]) {
     const res = await this.client

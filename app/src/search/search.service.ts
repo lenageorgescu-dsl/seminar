@@ -12,35 +12,24 @@ export class SearchService {
   ) {}
 
   public async searchData() {
-    //await this.typesense.keywordbla('tweets', 'dark');
-    //await this.typesense.placeholderSearch('test');
-    // await this.typesense.keywordSearch(
-    //   'tweets',
-    //   '@elonmusk good night from Nigeria',
-    //   ['text'],
-    // );
-    // await this.meili.keywordSearch(
-    //   'tweets',
-    //   '@elonmusk good night from Nigeria',
-    //   ['text'],
-    // );
-    // await this.elastic.keywordSearch(
-    //   'tweets',
-    //   '@elonmusk good night from Nigeria',
-    //   ['text'],
-    // );
-    // await this.elastic.placeholderSearch('tweets');
-    // await this.meili.boolQuerySearch('tweets', '', {
-    //   and: [{ text: 'run for president' }, { text: '2028' }],
-    //   or: [],
-    // });
-    await this.meili.boolQuerySearch('tweets', '', {
-      and: [{ text: 'run for president' }, { text: '2028' }],
-      or: [],
-    });
     // await this.elastic.boolQuerySearch('tweets', '', {
     //   and: [{ text: 'run for president' }, { text: '2028' }],
     //   or: [],
+    // });
+    // await this.elastic.boolQuerySearch('tweets', 'president', {
+    //   and: [],
+    // });
+    await this.elastic.boolQuerySearch('tweets', 'Food', 'text', {
+      and: [{ text: '@elonmusk No fast food?' }],
+    });
+    // await this.typesense.boolQuerySearch('tweets', 'food', 'text', {
+    //   and: [{ text: '@elonmusk No fast food?' }],
+    // });
+    // await this.meili.boolQuerySearch('tweets', 'food', 'text', {
+    //   and: [{ text: '@elonmusk No fast food?' }],
+    // });
+    // await this.elastic.boolQuerySearch('tweets', 'nigeria', 'text', {
+    //   and: [{ text: 'tesla' }],
     // });
   }
 }

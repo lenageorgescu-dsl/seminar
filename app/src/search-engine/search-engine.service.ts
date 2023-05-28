@@ -7,7 +7,6 @@ import { clearIntervalAsync, setIntervalAsync } from 'set-interval-async';
 
 export type BoolQuery = {
   and: any[];
-  or: any[];
 };
 
 export type cpuStats = {
@@ -124,12 +123,13 @@ export abstract class SearchEngineService {
   public async boolQuerySearch(
     collectionName: string,
     keyword: string,
+    field: string,
     query: BoolQuery,
   ) {
     try {
       const intervalStats = await this.setUpInterval(1);
       const startTime = Date.now();
-      const hits = await this.boolQuery(collectionName, keyword, query);
+      const hits = await this.boolQuery(collectionName, keyword, field, query);
       const endTime = Date.now();
       await this.tearDownInterval(intervalStats.intervalId);
       const data = JSON.stringify({
@@ -137,7 +137,12 @@ export abstract class SearchEngineService {
         engine: this.engineName,
         operation: 'boolQuerySearch',
         collection: collectionName,
-        boolQuery: this.stringifyBoolQuery(query, 'AND', 'OR', ' = ', false),
+        boolQuery: `Keyword: ${keyword}, Conditions: ${this.stringifyBoolQuery(
+          query,
+          'AND',
+          ' != ',
+          true,
+        )}`,
         hits: hits,
         startTime,
         endTime,
@@ -193,6 +198,7 @@ export abstract class SearchEngineService {
   protected boolQuery(
     collectionName: string,
     keyword: string,
+    field: string,
     query: BoolQuery,
   ) {
     return new Promise((resolve) => {
@@ -261,7 +267,6 @@ export abstract class SearchEngineService {
   protected stringifyBoolQuery(
     query: BoolQuery,
     and: string,
-    or: string,
     equals: string,
     quotationMark: boolean,
   ): string {
@@ -279,19 +284,6 @@ export abstract class SearchEngineService {
       if (quotationMark && this.hasWhiteSpace(word)) word = "'" + word + "'";
       res += word;
     }
-    for (let i = 0; i < query.or.length; i++) {
-      if (res != '') {
-        res += ' ';
-        res += or;
-        res += ' ';
-      }
-      const key = Object.keys(query.or[i]).pop();
-      res += key;
-      res += equals;
-      let word = query.or[i][key];
-      if (quotationMark && this.hasWhiteSpace(word)) word = "'" + word + "'";
-      res += word;
-    }
     console.log(res);
     return res;
   }
@@ -302,16 +294,11 @@ export abstract class SearchEngineService {
 
   protected getFieldsFromBoolQuery(query: BoolQuery): string[] {
     const fieldsAnd: string[] = [];
-    const fieldsOr: string[] = [];
     for (let i = 0; i < query.and.length; i++) {
       const keys = Object.keys(query.and[i]).pop();
       fieldsAnd.push(keys);
     }
-    for (let i = 0; i < query.or.length; i++) {
-      const keys = Object.keys(query.or[i]).pop();
-      fieldsOr.push(keys);
-    }
-    const fields = this.arrayUnique(fieldsAnd.concat(fieldsOr));
+    const fields = this.arrayUnique(fieldsAnd);
     return fields;
   }
 

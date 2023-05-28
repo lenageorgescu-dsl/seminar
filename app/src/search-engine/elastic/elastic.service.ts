@@ -38,61 +38,29 @@ export class ElasticService extends SearchEngineService {
   protected override async boolQuery(
     collectionName: string,
     keyword: string,
+    field: string,
     query: BoolQuery,
   ) {
     await this.client.indices.refresh({ index: collectionName });
-    // const and = this.formatAND(query);
-    // const or = this.reduce(this.formatOR(query)); //makes array into object
     let boolquery = {};
-    if (query.or.length == 0 && query.and.length == 0) {
+    if (query.and.length == 0) {
       throw new Error('Empty boolQuery');
     }
-    if (query.or.length == 0) {
-      boolquery = this.getAndQuery(query);
-    }
-    if (query.and.length == 0) {
-      boolquery = this.getOrQuery(query);
-    }
-    //console.log(this.reduce(and));
-
-    // const result = await this.client.search<Document>({
-    //   index: collectionName,
-    //   query: {
-    //     bool: {
-    //       should: [
-    //         or,
-    //         {
-    //           bool: {
-    //             must: and,
-    //           },
-    //         },
-    //       ],
-    //     },
-    //   },
-    // });
+    boolquery = this.getAndQuery(keyword, field, query);
     const result = await this.client.search<Document>({
       index: collectionName,
       query: boolquery,
     });
-
+    console.log(result);
     return (result as undefined as any).hits.total.value;
   }
 
-  private getAndQuery(query: BoolQuery) {
+  private getAndQuery(keyword: string, field: string, query: BoolQuery) {
     const and = this.formatAND(query);
     const res = {
       bool: {
-        must: and,
-      },
-    };
-    return res;
-  }
-
-  private getOrQuery(query: BoolQuery) {
-    const or = this.formatOR(query);
-    const res = {
-      bool: {
-        should: or,
+        must: [{ match: { [field]: keyword } }],
+        must_not: and,
       },
     };
     return res;
@@ -101,24 +69,7 @@ export class ElasticService extends SearchEngineService {
   private formatAND(query: BoolQuery) {
     const res: any[] = [];
     for (let i = 0; i < query.and.length; i++) {
-      const obj = { match: query.and[i] };
-      res.push(obj);
-    }
-    return res;
-  }
-
-  private reduce(arr: any[]) {
-    const obj = arr.reduce((acc, cur, i) => {
-      acc[i] = cur;
-      return acc;
-    }, {});
-    return obj;
-  }
-
-  private formatOR(query: BoolQuery) {
-    const res: any[] = [];
-    for (let i = 0; i < query.or.length; i++) {
-      const obj = { match: query.or[i] };
+      const obj = { term: query.and[i] };
       res.push(obj);
     }
     return res;
