@@ -70,9 +70,9 @@ export class CpuComponent {
     const tweetData = input.filter((s)=>s.collection == collection);
     const keywordData = tweetData.filter((s)=> s[wordKey] == keyword)
     const data = this.filterService.getArrNumber(keywordData, `${this.key}Percent`)
-    if (keyword.length > 50) keyword = keyword.substring(0, 50)+'...'
+    if (keyword.length > 150) keyword = keyword.substring(0, 150)+'...'
      const res: lineChartInput = {
-      title: `${this.name} Percentage while ${title} the ${collectionName}-Collection, \n Query: ${keyword}`,
+      title: [`${this.name} Percentage while ${title} the ${collectionName}-Collection`, `Query: ${keyword}`],
       data: data,
       xLabels: this.filterService.getxLabels(data)
     }

@@ -9,7 +9,7 @@ export type barChartNumbers = {
 }
 
 export type lineChartInput = {
-    title: string,
+    title: string | string[],
     data: number[][],
     xLabels: string[],
 }
