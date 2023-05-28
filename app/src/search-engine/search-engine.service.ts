@@ -137,7 +137,7 @@ export abstract class SearchEngineService {
         engine: this.engineName,
         operation: 'boolQuerySearch',
         collection: collectionName,
-        boolQuery: this.stringifyBoolQuery(query, 'AND', 'OR', ' = '),
+        boolQuery: this.stringifyBoolQuery(query, 'AND', 'OR', ' = ', false),
         hits: hits,
         startTime,
         endTime,
@@ -263,6 +263,7 @@ export abstract class SearchEngineService {
     and: string,
     or: string,
     equals: string,
+    quotationMark: boolean,
   ): string {
     let res = '';
     for (let i = 0; i < query.and.length; i++) {
@@ -274,7 +275,9 @@ export abstract class SearchEngineService {
       const key = Object.keys(query.and[i]).pop();
       res += key;
       res += equals;
-      res += query.and[i][key];
+      let word = query.and[i][key];
+      if (quotationMark && this.hasWhiteSpace(word)) word = "'" + word + "'";
+      res += word;
     }
     for (let i = 0; i < query.or.length; i++) {
       if (res != '') {
@@ -285,10 +288,16 @@ export abstract class SearchEngineService {
       const key = Object.keys(query.or[i]).pop();
       res += key;
       res += equals;
-      res += query.or[i][key];
+      let word = query.or[i][key];
+      if (quotationMark && this.hasWhiteSpace(word)) word = "'" + word + "'";
+      res += word;
     }
     console.log(res);
     return res;
+  }
+
+  private hasWhiteSpace(s: string): boolean {
+    return /\s/g.test(s);
   }
 
   protected getFieldsFromBoolQuery(query: BoolQuery): string[] {

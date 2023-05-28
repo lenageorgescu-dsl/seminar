@@ -40,7 +40,7 @@ export class OverviewComponent {
   keyWordSearchData: any[]=[];
 
   async ngOnInit(): Promise<void> {
-    const repoInfo = 'assets/1_experiment.json';
+    const repoInfo = 'assets/1-3_experiment_suite.json';
      const data = this.http
       .get<any[]>(repoInfo) //GeneralData array
       .subscribe((data) =>{

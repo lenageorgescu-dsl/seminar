@@ -29,9 +29,16 @@ export class SearchService {
     //   '@elonmusk good night from Nigeria',
     //   ['text'],
     // );
-    await this.elastic.placeholderSearch('tweets');
-
+    // await this.elastic.placeholderSearch('tweets');
     // await this.meili.boolQuerySearch('tweets', '', {
+    //   and: [{ text: 'run for president' }, { text: '2028' }],
+    //   or: [],
+    // });
+    await this.meili.boolQuerySearch('tweets', '', {
+      and: [{ text: 'run for president' }, { text: '2028' }],
+      or: [],
+    });
+    // await this.elastic.boolQuerySearch('tweets', '', {
     //   and: [{ text: 'run for president' }, { text: '2028' }],
     //   or: [],
     // });
