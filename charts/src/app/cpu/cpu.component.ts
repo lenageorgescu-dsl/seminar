@@ -26,6 +26,11 @@ export class CpuComponent {
     keywordLineDataTweetsGoodnight: lineChartInput = defaultLineChartInput;
     keywordLineDataArticlesMarkets: lineChartInput = defaultLineChartInput;
     keywordLineDataArticlesLonger: lineChartInput = defaultLineChartInput;
+    boolqueryLineDataTweetsObama: lineChartInput = defaultLineChartInput;
+    boolqueryLineDataTweetsEisenhower: lineChartInput = defaultLineChartInput;
+    boolqueryLineDataArticlesYear: lineChartInput = defaultLineChartInput;
+    boolqueryLineDataArticlesKeynes: lineChartInput = defaultLineChartInput;
+
 
   constructor(private filterService: FilterService){
     
@@ -36,10 +41,14 @@ export class CpuComponent {
     this.indexLineDataArticles = this.parseData(this.indexData, 'indexing', 'articles');
     this.placeholderLineDataTweets = this.parseData(this.placeholderData, 'placeholderSearching', 'tweets');
     this.placeholderLineDataArticles = this.parseData(this.placeholderData, 'placeholderSearching', 'articles');
-    this.keywordLineDataTweetsTesla = this.parseSearchData(this.keywordData, 'keywordSearching', 'Tesla', 'tweets')
-    this.keywordLineDataTweetsGoodnight = this.parseSearchData(this.keywordData, 'keywordSearching', '@elonmusk good night from Nigeria', 'tweets')
-    this.keywordLineDataArticlesMarkets = this.parseSearchData(this.keywordData, 'keywordSearching', 'Markets', 'articles')
-    this.keywordLineDataArticlesLonger = this.parseSearchData(this.keywordData, 'keywordSearching', '2019 Size, Share, Growth, Demand, Analysis, Research, Trends, Forecast, Applications, Products, Types, Technology, Production, Cost, Price, Profit, Leading Suppliers, Manufacturing Plants, Regions, Vendors', 'articles')
+    this.keywordLineDataTweetsTesla = this.parseSearchData(this.keywordData, 'keywordSearching', 'Tesla', 'tweets', 'keyword')
+    this.keywordLineDataTweetsGoodnight = this.parseSearchData(this.keywordData, 'keywordSearching', '@elonmusk good night from Nigeria', 'tweets', 'keyword')
+    this.keywordLineDataArticlesMarkets = this.parseSearchData(this.keywordData, 'keywordSearching', 'Markets', 'articles', 'keyword')
+    this.keywordLineDataArticlesLonger = this.parseSearchData(this.keywordData, 'keywordSearching', '2019 Size, Share, Growth, Demand, Analysis, Research, Trends, Forecast, Applications, Products, Types, Technology, Production, Cost, Price, Profit, Leading Suppliers, Manufacturing Plants, Regions, Vendors', 'articles', 'keyword')
+    this.boolqueryLineDataTweetsObama = this.parseSearchData(this.boolqueryData, 'boolQuerySearching',"Keyword: Obama, Conditions: text != \"@MrAndyNgo @elonmusk Thanks Obama\"" , 'tweets', 'boolQuery')
+    this.boolqueryLineDataTweetsEisenhower = this.parseSearchData(this.boolqueryData, 'boolQuerySearching',"Keyword: Eisenhower, Conditions: text != \"@Geek4MAGA @elonmusk @LegendaryEnergy @EndWokeness Don't forget Eisenhower warned us too!\"" , 'tweets', 'boolQuery')
+    this.boolqueryLineDataArticlesYear = this.parseSearchData(this.boolqueryData, 'boolQuerySearching',"Keyword: year, Conditions: author != \"J. Bradford DeLong\" AND author != Jolyjoy" , 'articles', 'boolQuery')
+    this.boolqueryLineDataArticlesKeynes = this.parseSearchData(this.boolqueryData, 'boolQuerySearching',"Keyword: keynes, Conditions: author != \"J. Bradford DeLong\"" , 'articles', 'boolQuery')
   }
   
 
@@ -56,14 +65,14 @@ export class CpuComponent {
 
   }
 
-  parseSearchData(input: any[], title: string, keyword: string, collection: string): lineChartInput{
+  parseSearchData(input: any[], title: string, keyword: string, collection: string, wordKey: string): lineChartInput{
     const collectionName = collection.charAt(0).toUpperCase() + collection.slice(1);;
     const tweetData = input.filter((s)=>s.collection == collection);
-    const keywordData = tweetData.filter((s)=> s.keyword == keyword)
+    const keywordData = tweetData.filter((s)=> s[wordKey] == keyword)
     const data = this.filterService.getArrNumber(keywordData, `${this.key}Percent`)
-    if (keyword.length > 15) keyword = keyword.substring(0, 15)+'...'
+    if (keyword.length > 50) keyword = keyword.substring(0, 50)+'...'
      const res: lineChartInput = {
-      title: `${this.name} Percentage while ${title} the ${collectionName}-Collection, Query: ${keyword}`,
+      title: `${this.name} Percentage while ${title} the ${collectionName}-Collection, \n Query: ${keyword}`,
       data: data,
       xLabels: this.filterService.getxLabels(data)
     }
