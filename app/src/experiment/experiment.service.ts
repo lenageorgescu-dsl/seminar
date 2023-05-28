@@ -23,11 +23,13 @@ export class ExperimentService implements OnApplicationBootstrap {
     this.setVersion(version);
     this.setResultPath();
     this.getInitialValues();
+
     await this.indexAll('tweets');
     await this.placeholderSearchAll('tweets');
     await this.indexAll('articles');
     await this.placeholderSearchAll('articles');
 
+    //KeywordSearch
     await this.keywordSearchAll('tweets', '@elonmusk good night from Nigeria', [
       'text',
     ]);
@@ -38,6 +40,7 @@ export class ExperimentService implements OnApplicationBootstrap {
       ['description'],
     );
     await this.keywordSearchAll('articles', 'Markets', ['description']);
+    //BoolquerySearch
     await this.boolQuerySearchAll('tweets', 'Eisenhower', 'text', {
       and: [
         {
@@ -47,6 +50,24 @@ export class ExperimentService implements OnApplicationBootstrap {
     });
     await this.boolQuerySearchAll('tweets', 'Obama', 'text', {
       and: [{ text: '@MrAndyNgo @elonmusk Thanks Obama' }],
+    });
+
+    await this.boolQuerySearchAll('articles', 'year', 'description', {
+      and: [
+        {
+          author: 'J. Bradford DeLong',
+        },
+        {
+          author: 'Jolyjoy',
+        },
+      ],
+    });
+    await this.boolQuerySearchAll('articles', 'keynes', 'description', {
+      and: [
+        {
+          author: 'J. Bradford DeLong',
+        },
+      ],
     });
 
     await this.parseResults(version);

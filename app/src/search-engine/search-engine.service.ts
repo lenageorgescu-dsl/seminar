@@ -151,7 +151,7 @@ export abstract class SearchEngineService {
         cpuPercent: intervalStats.cpu,
         cpuTime: intervalStats.cpuTime,
       });
-      console.log('FACETED SEARCH: ');
+      console.log('BOOLQUERY SEARCH: ');
       console.log(data);
       writeFileSync(this.path, data, { flag: 'a' });
     } catch (e) {

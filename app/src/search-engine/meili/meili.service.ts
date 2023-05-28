@@ -78,7 +78,6 @@ export class MeiliService extends SearchEngineService {
     const res = await this.client.index(collectionName).search(keyword, {
       filter: newQuery,
     });
-    console.log(res);
     return res.estimatedTotalHits;
   }
 

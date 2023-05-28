@@ -12,38 +12,6 @@ export class SearchService {
   ) {}
 
   public async searchData() {
-    // await this.elastic.boolQuerySearch('tweets', '', {
-    //   and: [{ text: 'run for president' }, { text: '2028' }],
-    //   or: [],
-    // });
-    // await this.elastic.boolQuerySearch('tweets', 'president', {
-    //   and: [],
-    // });
-    await this.typesense.boolQuerySearch('tweets', 'Eisenhower', 'text', {
-      and: [
-        {
-          text: "@Geek4MAGA @elonmusk @LegendaryEnergy @EndWokeness Don't forget Eisenhower warned us too!",
-        },
-      ],
-    });
-    await this.meili.boolQuerySearch('tweets', 'Eisenhower', 'text', {
-      and: [
-        {
-          text: "@Geek4MAGA @elonmusk @LegendaryEnergy @EndWokeness Don't forget Eisenhower warned us too!",
-        },
-      ],
-    });
-
-    await this.elastic.boolQuerySearch('tweets', 'Eisenhower', 'text', {
-      and: [
-        {
-          text: "@Geek4MAGA @elonmusk @LegendaryEnergy @EndWokeness Don't forget Eisenhower warned us too!",
-        },
-      ],
-    });
-
-    // await this.elastic.boolQuerySearch('tweets', 'nigeria', 'text', {
-    //   and: [{ text: 'tesla' }],
-    // });
+    console.log('Enter searches here');
   }
 }
