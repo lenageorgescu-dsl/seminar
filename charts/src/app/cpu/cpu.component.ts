@@ -15,6 +15,8 @@ export class CpuComponent {
   @Input() indexData: any[]=[]
   @Input() placeholderData: any[]=[]
   @Input() keywordData: any[] = []
+   @Input() boolqueryData: any[] = []
+
 
     indexLineDataTweets: lineChartInput = defaultLineChartInput;
     indexLineDataArticles: lineChartInput = defaultLineChartInput;

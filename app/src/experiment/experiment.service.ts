@@ -97,8 +97,8 @@ export class ExperimentService implements OnApplicationBootstrap {
     query: BoolQuery,
   ) {
     await this.typesense.boolQuerySearch(collectionName, keyword, field, query);
-    await this.typesense.boolQuerySearch(collectionName, keyword, field, query);
-    await this.typesense.boolQuerySearch(collectionName, keyword, field, query);
+    await this.meili.boolQuerySearch(collectionName, keyword, field, query);
+    await this.elastic.boolQuerySearch(collectionName, keyword, field, query);
   }
 
   private async placeholderSearchAll(collectionName: string) {

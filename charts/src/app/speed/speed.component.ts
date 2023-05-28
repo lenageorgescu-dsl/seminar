@@ -17,11 +17,14 @@ export class SpeedComponent {
   @Input() indexData: any[]=[]
   @Input() placeholderData: any[]=[]
   @Input() keywordData: any[] = []
+  @Input() boolqueryData: any[] = []
 
     indexBarData: barChartInput = defaultBarChartInput;
     placeholderBarData: barChartInput = defaultBarChartInput;
     keywordTweetBarData: barChartInput = defaultBarChartInput;
     keywordArticleBarData: barChartInput = defaultBarChartInput;
+    boolqueryTweetBarData: barChartInput = defaultBarChartInput;
+    boolqueryArticleBarData: barChartInput = defaultBarChartInput;
 
   constructor(private filterService: FilterService){
     
@@ -30,8 +33,10 @@ export class SpeedComponent {
   ngOnChanges(){
     this.indexBarData = this.parseSmallerData(this.indexData, 'Index');
     this.placeholderBarData = this.parseSmallerData(this.placeholderData, 'PlaceholderSearch');
-    this.keywordTweetBarData = this.parseBiggerDataTweets(this.keywordData, 'KeyWordSearch')
-    this.keywordArticleBarData = this.parseBiggerDataArticles(this.keywordData, 'KeyWordSearch')
+    this.keywordTweetBarData = this.parseBiggerData(this.keywordData, 'KeyWordSearch', 'tweets', ['Tesla', '@elonmusk good night from Nigeria'], 'keyword')
+    this.keywordArticleBarData = this.parseBiggerData(this.keywordData, 'KeyWordSearch', 'articles', ['Markets', '2019 Size, Share, Growth, Demand, Analysis, Research, Trends, Forecast, Applications, Products, Types, Technology, Production, Cost, Price, Profit, Leading Suppliers, Manufacturing Plants, Regions, Vendors'], 'keyword')
+    this.boolqueryTweetBarData = this.parseBiggerData (this.boolqueryData, 'BoolQuerySearch', 'tweets', ["Keyword: Obama, Conditions: text != \"@MrAndyNgo @elonmusk Thanks Obama\"","Keyword: Eisenhower, Conditions: text != \"@Geek4MAGA @elonmusk @LegendaryEnergy @EndWokeness Don't forget Eisenhower warned us too!\""], 'boolQuery')
+    this.boolqueryArticleBarData = this.parseBiggerData (this.boolqueryData, 'BoolQuerySearch', 'articles', ["Keyword: year, Conditions: author != \"J. Bradford DeLong\" AND author != Jolyjoy", "Keyword: keynes, Conditions: author != \"J. Bradford DeLong\""], 'boolQuery')
   }
 
 
@@ -47,26 +52,20 @@ export class SpeedComponent {
     return res;
   }
 
-  parseBiggerDataTweets(input: any, title: string):  barChartInput{
-    const data = this.filterService.getTweets(input);
-    const tesla = data.filter((s)=> s.keyword == 'Tesla');
-    const goodnight = data.filter((s)=> s.keyword != 'Tesla');
-    const res = [{data: this.filterService.getNumbers(tesla, this.key), label: 'Tesla'},{data: this.filterService.getNumbers(goodnight, this.key), label: '@elonmusk good night from Nigeria'},]
+  parseBiggerData(input: any[], title: string, collection: string, keywords: string[], wordKey: string):  barChartInput{
+    const collectionName = collection.charAt(0).toUpperCase() + collection.slice(1);
+    const data = input.filter((s)=> s.collection == collection);
+    const set0 = data.filter((s)=> s[wordKey] == keywords[0]);
+    const set1 = data.filter((s)=> s[wordKey] == keywords[1]);
+    console.log(set0);
+    console.log(set1)
+    let shortenedKeyWords: string[] = []
+    keywords.forEach((s)=> {
+      if (s.length > 50) shortenedKeyWords.push(s.substring(0, 50)+'...')
+      else shortenedKeyWords.push(s)})
+    const res = [{data: this.filterService.getNumbers(set0, this.key), label: shortenedKeyWords[0]},{data: this.filterService.getNumbers(set1, this.key), label: shortenedKeyWords[1]},]
     const result: barChartInput = {
-      title: `${title}${this.name}, Tweet-Collection`,
-      labels: defaultLabels,
-      datasets: res
-    }
-    return result;
-  }
-
-  parseBiggerDataArticles(input: any, title: string):  barChartInput{
-    const data = this.filterService.getArticles(input);
-    const markets = data.filter((s)=> s.keyword == 'Markets');
-    const longer = data.filter((s)=> s.keyword != 'Markets');
-    const res = [{data: this.filterService.getNumbers(markets, this.key), label: 'Markets'},{data: this.filterService.getNumbers(longer, this.key), label: '2019 Size, Share, Growth, Demand, Analysis...'},]
-    const result: barChartInput = {
-      title: `${title}${this.name}, Article-Collection`,
+      title: `${title}${this.name}, ${collectionName}-Collection`,
       labels: defaultLabels,
       datasets: res
     }

@@ -3,8 +3,8 @@
 <button mat-button mat-raised-button color="primary" (click)="openCpu()">CPU</button>
 <button mat-button mat-raised-button color="primary" (click)="openMemory()">Memory</button>
 <button mat-button mat-raised-button color="primary" (click)="openHits()">Hits</button>
-<app-cpu [hidden]='hideCpu' [indexData]="indexData" [placeholderData]="placeholderSearchData" [keywordData]="keyWordSearchData" [key]="cpuKey" [name]="cpuName"></app-cpu>
-<app-cpu [hidden]='hideMemory' [key]="memKey" [name]="memName" [indexData]="indexData" [placeholderData]="placeholderSearchData" [keywordData]="keyWordSearchData"></app-cpu>
-<app-speed [hidden]='hideSpeed' [indexData]="indexData" [placeholderData]="placeholderSearchData" [keywordData]="keyWordSearchData" [key]="speedKey" [name]="speedName" [title]="speedTitle"></app-speed>
-<app-speed [hidden]='hideHits' [indexData]="indexData" [placeholderData]="placeholderSearchData" [keywordData]="keyWordSearchData" [key]="hitKey" [name]="hitName" [title]="hitTitle"></app-speed>
+<app-cpu [hidden]='hideCpu' [indexData]="indexData" [placeholderData]="placeholderSearchData" [keywordData]="keyWordSearchData" [key]="cpuKey" [name]="cpuName" [boolqueryData] ="boolquerySearchData"></app-cpu>
+<app-cpu [hidden]='hideMemory' [key]="memKey" [name]="memName" [indexData]="indexData" [placeholderData]="placeholderSearchData" [keywordData]="keyWordSearchData" [boolqueryData] ="boolquerySearchData"></app-cpu>
+<app-speed [hidden]='hideSpeed' [indexData]="indexData" [placeholderData]="placeholderSearchData" [keywordData]="keyWordSearchData" [boolqueryData] ="boolquerySearchData" [key]="speedKey" [name]="speedName" [title]="speedTitle"></app-speed>
+<app-speed [hidden]='hideHits' [indexData]="indexData" [placeholderData]="placeholderSearchData" [keywordData]="keyWordSearchData" [boolqueryData] ="boolquerySearchData" [key]="hitKey" [name]="hitName" [title]="hitTitle"></app-speed>
 <app-storage [hidden]='hideStorage' [data]="storageData"> </app-storage>

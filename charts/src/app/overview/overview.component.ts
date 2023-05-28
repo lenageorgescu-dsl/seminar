@@ -38,18 +38,19 @@ export class OverviewComponent {
   indexData: any[]=[];
   placeholderSearchData: any[] = [];
   keyWordSearchData: any[]=[];
+  boolquerySearchData: any[] = [];
 
   async ngOnInit(): Promise<void> {
-    const repoInfo = 'assets/1-3_experiment_suite.json';
+    const repoInfo = 'assets/4_experiment.json';
      const data = this.http
       .get<any[]>(repoInfo) //GeneralData array
       .subscribe((data) =>{
-        console.log(data)
         this.initData = data.filter((s: any)=> s.operation == 'init');
         this.storageData = data.filter((s)=> (s.operation == 'init' || s.operation == 'index')).map((s)=>({name: 'Storage', operation: s.operation, engine: s.engine, collection: s.collection, storage: s.storageMega}));
         this.indexData = data.filter((s)=> s.operation == 'index');
         this.placeholderSearchData = data.filter((s)=> s.operation == ('placeholderSearch'));
         this.keyWordSearchData = data.filter((s)=> s.operation == ('keywordSearch'));
+        this.boolquerySearchData = data.filter((s)=> s.operation == ('boolQuerySearch'))
       })
   }
 
