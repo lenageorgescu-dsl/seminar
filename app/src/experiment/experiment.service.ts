@@ -131,6 +131,7 @@ export class ExperimentService implements OnApplicationBootstrap {
           (s) =>
             s.engine == element.engine &&
             s.operation == element.operation &&
+            s.collection == element.collection &&
             s.keyword == element.keyword &&
             s.boolQuery == element.boolQuery,
         )
