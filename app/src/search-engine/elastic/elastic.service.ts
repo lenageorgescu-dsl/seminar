@@ -41,24 +41,61 @@ export class ElasticService extends SearchEngineService {
     query: BoolQuery,
   ) {
     await this.client.indices.refresh({ index: collectionName });
-    const and = this.formatAND(query);
-    const or = this.reduce(this.formatOR(query)); //makes array into object
+    // const and = this.formatAND(query);
+    // const or = this.reduce(this.formatOR(query)); //makes array into object
+    let boolquery = {};
+    if (query.or.length == 0 && query.and.length == 0) {
+      throw new Error('Empty boolQuery');
+    }
+    if (query.or.length == 0) {
+      boolquery = this.getAndQuery(query);
+    }
+    if (query.and.length == 0) {
+      boolquery = this.getOrQuery(query);
+    }
+    //console.log(this.reduce(and));
+
+    // const result = await this.client.search<Document>({
+    //   index: collectionName,
+    //   query: {
+    //     bool: {
+    //       should: [
+    //         or,
+    //         {
+    //           bool: {
+    //             must: and,
+    //           },
+    //         },
+    //       ],
+    //     },
+    //   },
+    // });
     const result = await this.client.search<Document>({
       index: collectionName,
-      query: {
-        bool: {
-          should: [
-            or,
-            {
-              bool: {
-                must: and,
-              },
-            },
-          ],
-        },
-      },
+      query: boolquery,
     });
+
     return (result as undefined as any).hits.total.value;
+  }
+
+  private getAndQuery(query: BoolQuery) {
+    const and = this.formatAND(query);
+    const res = {
+      bool: {
+        must: and,
+      },
+    };
+    return res;
+  }
+
+  private getOrQuery(query: BoolQuery) {
+    const or = this.formatOR(query);
+    const res = {
+      bool: {
+        should: or,
+      },
+    };
+    return res;
   }
 
   private formatAND(query: BoolQuery) {
