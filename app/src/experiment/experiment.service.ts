@@ -254,10 +254,9 @@ export class ExperimentService implements OnApplicationBootstrap {
     const keywordData = this.correctOperatorAxis(data, 'keywordSearch');
     const boolqueryData = this.correctOperatorAxis(data, 'boolQuerySearch');
     placeholderData.forEach((s) => total.push(s));
-    //console.log(total);
-    total.push(boolqueryData);
-    total.push(keywordData);
-    total.push(rest);
+    boolqueryData.forEach((s) => total.push(s));
+    keywordData.forEach((s) => total.push(s));
+    rest.forEach((s) => total.push(s));
     writeFileSync(
       `${ExperimentService.getResultPath()}${path}_axis.json`,
       JSON.stringify(total),
@@ -291,7 +290,6 @@ export class ExperimentService implements OnApplicationBootstrap {
       if (res.cpuTime[lastIndex] > maxValue) maxValue = res.cpuTime[lastIndex];
     });
     const finalData: any[] = [];
-    console.log(sorted);
     sorted.forEach((t) => {
       const result = t;
       const relevantData = {
