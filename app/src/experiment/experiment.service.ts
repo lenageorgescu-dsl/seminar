@@ -246,16 +246,20 @@ export class ExperimentService implements OnApplicationBootstrap {
     const data: any[] = JSON.parse(
       readFileSync(`${ExperimentService.getResultPath()}${path}.json`, 'utf-8'),
     );
-    const rest: any[] = data.filter(
-      (s) => s.operation == 'init' || s.operation == 'index',
-    );
+    const rest: any[] = data.filter((s) => s.operation == 'init');
     const total: any[] = [];
-    const placeholderData = this.correctOperatorAxis(data, 'placeholderSearch');
-    const keywordData = this.correctOperatorAxis(data, 'keywordSearch');
-    const boolqueryData = this.correctOperatorAxis(data, 'boolQuerySearch');
+    const indexData = this.correctOperatorAxis(data, 'index', 500);
+    const placeholderData = this.correctOperatorAxis(
+      data,
+      'placeholderSearch',
+      10,
+    );
+    const keywordData = this.correctOperatorAxis(data, 'keywordSearch', 10);
+    const boolqueryData = this.correctOperatorAxis(data, 'boolQuerySearch', 10);
     placeholderData.forEach((s) => total.push(s));
     boolqueryData.forEach((s) => total.push(s));
     keywordData.forEach((s) => total.push(s));
+    indexData.forEach((s) => total.push(s));
     rest.forEach((s) => total.push(s));
     writeFileSync(
       `${ExperimentService.getResultPath()}${path}_axis.json`,
@@ -263,16 +267,20 @@ export class ExperimentService implements OnApplicationBootstrap {
     );
   }
 
-  private correctOperatorAxis(input: any[], operation: string) {
+  private correctOperatorAxis(
+    input: any[],
+    operation: string,
+    difference: number,
+  ) {
     const data: any[] = input.filter((s) => s.operation == operation);
     const sorted: any[] = [];
-    let minValue = 10000;
+    let minValue = 10000000;
     let maxValue = 0;
     data.forEach((s) => {
       const fullData = s;
       const cpuTime = s.cpuTime;
       for (let i = 0; i < s.cpuTime.length; i++) {
-        cpuTime[i] = this.roundNumber(cpuTime[i]);
+        cpuTime[i] = this.roundNumber(cpuTime[i], difference);
       }
       const res: TimeStats = this.iterateAndAggregate(
         cpuTime,
@@ -301,7 +309,7 @@ export class ExperimentService implements OnApplicationBootstrap {
         relevantData,
         minValue,
         maxValue,
-        10,
+        difference,
       );
       result.cpuPercent = res.cpuPercent;
       result.memPercent = res.memPercent;
@@ -312,8 +320,8 @@ export class ExperimentService implements OnApplicationBootstrap {
     return finalData;
   }
 
-  private roundNumber(num: number) {
-    return Math.round(num / 10) * 10;
+  private roundNumber(num: number, difference: number) {
+    return Math.round(num / difference) * difference;
   }
 
   private iterateAndAggregate(
