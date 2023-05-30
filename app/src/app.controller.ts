@@ -81,4 +81,10 @@ export class ExperimentController {
     this.experiment.compileResults(from, to);
     return 'Compiling results finished';
   }
+
+  @Get('axis/:path')
+  correctAxis(@Param('path') path: string) {
+    this.experiment.correctAxis(path);
+    return 'Correcting axis finished';
+  }
 }

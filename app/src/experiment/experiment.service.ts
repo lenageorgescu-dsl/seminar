@@ -141,6 +141,7 @@ export class ExperimentService implements OnApplicationBootstrap {
     });
   }
 
+  /**Method to aggregate several experiments */
   public compileResults(from: number, to: number) {
     const data: Array<any[]> = [];
     for (let i = from; i <= to; i++) {
@@ -190,7 +191,6 @@ export class ExperimentService implements OnApplicationBootstrap {
     for (const key in matches[0]) {
       if (typeof matches[0][key] != 'string') relevantKeys.push(key);
     }
-    console.log(relevantKeys);
     relevantKeys.forEach((s) => {
       const numberArr: any[] = [];
       for (let i = 0; i < matches.length; i++) {
@@ -240,4 +240,120 @@ export class ExperimentService implements OnApplicationBootstrap {
   public static getResultPath(): string {
     return this.resultPath;
   }
+
+  /**Method to get the correct x-Axis-values on the line-charts */
+
+  public correctAxis(path: string) {
+    const data: any[] = JSON.parse(
+      readFileSync(`${ExperimentService.getResultPath()}${path}.json`, 'utf-8'),
+    ).filter((s) => s.operation != 'init' && s.operation != 'index'); //TODO: Adjust index
+    const sorted: any[] = [];
+    const minValue = 10000;
+    const maxValue = 0;
+    data.forEach((s) => {
+      const fullData = s;
+      const cpuTime = s.cpuTime;
+      for (let i = 0; i < cpuTime.length; i++) {
+        cpuTime[i] = this.roundNumber(cpuTime[i]);
+      }
+      const res: TimeStats = this.iterateAndAggregate(
+        cpuTime,
+        s.cpuPercent,
+        s.memPercent,
+        0,
+      );
+      this.sort(res);
+      fullData.cpuTime = res.cpuTime;
+      fullData.cpuPercent = res.cpuPercent;
+      fullData.memPercent = res.memPercent;
+      sorted.push(fullData);
+      const lastIndex = res.cpuTime.length - 1;
+      if (res.cpuTime[0] < minValue) res.cpuTime[0] = minValue;
+      if (res.cpuTime[lastIndex] > maxValue) res.cpuTime[lastIndex] = maxValue;
+    });
+
+    writeFileSync(
+      `${ExperimentService.getResultPath()}${path}_axis.json`,
+      JSON.stringify(sorted),
+    );
+  }
+
+  private roundNumber(num: number) {
+    return Math.round(num / 10) * 10;
+  }
+
+  private iterateAndAggregate(
+    timeArr: number[],
+    cpuArr: number[],
+    memArr: number[],
+    index: number,
+  ): TimeStats {
+    if (index == timeArr.length) {
+      const res: TimeStats = {
+        cpuTime: timeArr,
+        cpuPercent: cpuArr,
+        memPercent: memArr,
+      };
+      return res;
+    }
+
+    const time = timeArr[index];
+    let lastIncludedIndex = index;
+    for (let i = index; i < timeArr.length; i++) {
+      if (time == timeArr[i]) lastIncludedIndex = i;
+      else break;
+    }
+    return this.aggregate(timeArr, cpuArr, memArr, index, lastIncludedIndex);
+  }
+
+  private aggregate(
+    timeArr: number[],
+    cpuArr: number[],
+    memArr: number[],
+    index: number,
+    lastIncludedIndex: number,
+  ) {
+    const cpuPart = cpuArr.slice(index, lastIncludedIndex + 1);
+    const cpuMedian = this.median(cpuPart);
+    const memPart = memArr.slice(index, lastIncludedIndex + 1);
+    const memMedian = this.median(memPart);
+    timeArr.splice(index + 1, lastIncludedIndex - index);
+    cpuArr.splice(index + 1, lastIncludedIndex - index);
+    memArr.splice(index + 1, lastIncludedIndex - index);
+    cpuArr[index] = cpuMedian;
+    memArr[index] = memMedian;
+    return this.iterateAndAggregate(timeArr, cpuArr, memArr, index + 1);
+  }
+
+  private sort(stats: TimeStats): TimeStats {
+    const arr = [];
+    for (let i = 0; i < stats.cpuPercent.length; i++) {
+      const element = {
+        time: stats.cpuTime[i],
+        cpu: stats.cpuPercent[i],
+        mem: stats.memPercent[i],
+      };
+      arr.push(element);
+    }
+    arr.sort((a, b) => (a.time > b.time ? 1 : -1));
+    const res: TimeStats = { cpuPercent: [], cpuTime: [], memPercent: [] };
+    arr.forEach((t) => {
+      res.cpuPercent.push(t.cpu);
+      res.cpuTime.push(t.time);
+      res.memPercent.push(t.mem);
+    });
+    return res;
+  }
+
+  private fillGaps(stats: TimeStats, min: number, max: number): TimeStats {
+    return null as unknown as TimeStats;
+  }
+
+  // Was in leere Stellen schreiben?
 }
+
+export type TimeStats = {
+  cpuTime: number[];
+  cpuPercent: number[];
+  memPercent: number[];
+};
