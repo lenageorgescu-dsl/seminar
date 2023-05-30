@@ -199,7 +199,6 @@ export class ExperimentService implements OnApplicationBootstrap {
       if (typeof numberArr[0] == 'number') res[s] = this.median(numberArr);
       else res[s] = this.medianArray(numberArr);
     });
-    console.log('RESULT: ', res);
     return res;
   }
 
@@ -246,14 +245,34 @@ export class ExperimentService implements OnApplicationBootstrap {
   public correctAxis(path: string) {
     const data: any[] = JSON.parse(
       readFileSync(`${ExperimentService.getResultPath()}${path}.json`, 'utf-8'),
-    ).filter((s) => s.operation != 'init' && s.operation != 'index'); //TODO: Adjust index
+    );
+    const rest: any[] = data.filter(
+      (s) => s.operation == 'init' || s.operation == 'index',
+    );
+    const total: any[] = [];
+    const placeholderData = this.correctOperatorAxis(data, 'placeholderSearch');
+    const keywordData = this.correctOperatorAxis(data, 'keywordSearch');
+    const boolqueryData = this.correctOperatorAxis(data, 'boolQuerySearch');
+    placeholderData.forEach((s) => total.push(s));
+    //console.log(total);
+    total.push(boolqueryData);
+    total.push(keywordData);
+    total.push(rest);
+    writeFileSync(
+      `${ExperimentService.getResultPath()}${path}_axis.json`,
+      JSON.stringify(total),
+    );
+  }
+
+  private correctOperatorAxis(input: any[], operation: string) {
+    const data: any[] = input.filter((s) => s.operation == operation);
     const sorted: any[] = [];
-    const minValue = 10000;
-    const maxValue = 0;
+    let minValue = 10000;
+    let maxValue = 0;
     data.forEach((s) => {
       const fullData = s;
       const cpuTime = s.cpuTime;
-      for (let i = 0; i < cpuTime.length; i++) {
+      for (let i = 0; i < s.cpuTime.length; i++) {
         cpuTime[i] = this.roundNumber(cpuTime[i]);
       }
       const res: TimeStats = this.iterateAndAggregate(
@@ -268,14 +287,31 @@ export class ExperimentService implements OnApplicationBootstrap {
       fullData.memPercent = res.memPercent;
       sorted.push(fullData);
       const lastIndex = res.cpuTime.length - 1;
-      if (res.cpuTime[0] < minValue) res.cpuTime[0] = minValue;
-      if (res.cpuTime[lastIndex] > maxValue) res.cpuTime[lastIndex] = maxValue;
+      if (res.cpuTime[0] < minValue) minValue = res.cpuTime[0];
+      if (res.cpuTime[lastIndex] > maxValue) maxValue = res.cpuTime[lastIndex];
     });
+    const finalData: any[] = [];
+    console.log(sorted);
+    sorted.forEach((t) => {
+      const result = t;
+      const relevantData = {
+        cpuPercent: t.cpuPercent,
+        memPercent: t.memPercent,
+        cpuTime: t.cpuTime,
+      };
+      const res: TimeStats = this.fillGaps(
+        relevantData,
+        minValue,
+        maxValue,
+        10,
+      );
+      result.cpuPercent = res.cpuPercent;
+      result.memPercent = res.memPercent;
+      result.cpuTime = res.cpuTime;
 
-    writeFileSync(
-      `${ExperimentService.getResultPath()}${path}_axis.json`,
-      JSON.stringify(sorted),
-    );
+      finalData.push(result);
+    });
+    return finalData;
   }
 
   private roundNumber(num: number) {
@@ -326,30 +362,95 @@ export class ExperimentService implements OnApplicationBootstrap {
   }
 
   private sort(stats: TimeStats): TimeStats {
+    const arr = this.bundleStats(stats);
+    arr.sort((a, b) => (a.cpuTime > b.cpuTime ? 1 : -1));
+    const res = this.unbundleStats(arr);
+    return res;
+  }
+
+  private bundleStats(stats: TimeStats) {
     const arr = [];
     for (let i = 0; i < stats.cpuPercent.length; i++) {
       const element = {
-        time: stats.cpuTime[i],
-        cpu: stats.cpuPercent[i],
-        mem: stats.memPercent[i],
+        cpuTime: stats.cpuTime[i],
+        cpuPercent: stats.cpuPercent[i],
+        memPercent: stats.memPercent[i],
       };
       arr.push(element);
     }
-    arr.sort((a, b) => (a.time > b.time ? 1 : -1));
+    return arr;
+  }
+
+  private unbundleStats(arr: any[]): TimeStats {
     const res: TimeStats = { cpuPercent: [], cpuTime: [], memPercent: [] };
     arr.forEach((t) => {
-      res.cpuPercent.push(t.cpu);
-      res.cpuTime.push(t.time);
-      res.memPercent.push(t.mem);
+      res.cpuPercent.push(t.cpuPercent);
+      res.cpuTime.push(t.cpuTime);
+      res.memPercent.push(t.memPercent);
     });
     return res;
   }
 
-  private fillGaps(stats: TimeStats, min: number, max: number): TimeStats {
-    return null as unknown as TimeStats;
+  private fillGaps(
+    stats: TimeStats,
+    min: number,
+    max: number,
+    difference: number,
+  ): TimeStats {
+    const timearr = [];
+    for (let i = min; i <= max; i += difference) {
+      const res = { cpuTime: i, cpuPercent: null, memPercent: null };
+      timearr.push(res);
+    }
+    const arr = this.bundleStats(stats);
+    for (let i = 0; i < timearr.length; i++) {
+      for (let j = 0; j < arr.length; j++) {
+        if (timearr[i].cpuTime == arr[j].cpuTime) {
+          timearr[i].cpuPercent = arr[j].cpuPercent;
+          timearr[i].memPercent = arr[j].memPercent;
+        }
+      }
+    }
+    const filled = this.fillAllGaps(timearr);
+    const res = this.unbundleStats(filled);
+    return res;
   }
 
-  // Was in leere Stellen schreiben?
+  private fillAllGaps(arr: any[]) {
+    let firstIndex;
+    for (let i = 0; i < arr.length; i++) {
+      if (arr[i].cpuPercent != null) {
+        firstIndex = i; //Get first index
+        break;
+      }
+    }
+    let lastIndex;
+    for (let i = 0; i < arr.length; i++) {
+      if (arr[i].cpuPercent != null) lastIndex = i; //Get last index
+    }
+    for (let i = 0; i <= firstIndex; i++) {
+      arr[i].cpuPercent = arr[firstIndex].cpuPercent; //Set first values
+      arr[i].memPercent = arr[firstIndex].memPercent;
+    }
+    for (let i = lastIndex; i < arr.length; i++) {
+      arr[i].cpuPercent = arr[lastIndex].cpuPercent; //Set last values
+      arr[i].memPercent = arr[lastIndex].memPercent;
+    }
+    let lastValidCpu = arr[firstIndex].cpuPercent; //Set in between values
+    let lastValidMem = arr[firstIndex].cpuPercent;
+
+    for (let i = firstIndex; i < arr.length; i++) {
+      //Diese Funktion könnte bei Bedarf noch glätter gemacht werden
+      if (arr[i].cpuPercent == null) {
+        arr[i].cpuPercent = lastValidCpu;
+        arr[i].memPercent = lastValidMem;
+      } else {
+        lastValidCpu = arr[i].cpuPercent;
+        lastValidMem = arr[i].memPercent;
+      }
+    }
+    return arr;
+  }
 }
 
 export type TimeStats = {
