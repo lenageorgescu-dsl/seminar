@@ -41,7 +41,7 @@ export class OverviewComponent {
   boolquerySearchData: any[] = [];
 
   async ngOnInit(): Promise<void> {
-    const repoInfo = 'assets/4-13_experiment_suite.json';
+    const repoInfo = 'assets/4-13_experiment_suite_axis.json';
      const data = this.http
       .get<any[]>(repoInfo) //GeneralData array
       .subscribe((data) =>{

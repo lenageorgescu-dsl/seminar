@@ -32,7 +32,7 @@ export class StorageComponent {
     const data = [{data: data1, label: 'Init'},{data: data2, label: 'Tweets'},{data: data3, label: 'Articles'},{data: data4, label: 'Total', backgroundColor: 'rgb(0,102,0,0.4)'}]
 
     const res: barChartInput = {
-      title: 'Storage',
+      title: 'Storage in Megabytes',
       labels: defaultLabels,
       datasets: data
     }

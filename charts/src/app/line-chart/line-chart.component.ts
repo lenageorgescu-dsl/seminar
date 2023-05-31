@@ -47,12 +47,12 @@ export class LineChartComponent {
       {
         data: [ 28, 48, 40, 19, 86, 27, 90 ],
         label: 'MeiliSearch',
-        backgroundColor: 'rgba(46,204,113,0.2)',
-        borderColor: 'rgba(46,204,113,1)',
-        pointBackgroundColor: 'rgba(46,204,113,1)',
+        backgroundColor: 'rgba(255,165,0, 0.2)',
+        borderColor: 'rgba(255,165,0, 1)',
+        pointBackgroundColor: 'rgba(255,165,0, 1)',
         pointBorderColor: '#fff',
         pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgba(46,204,113,1)',
+        pointHoverBorderColor: 'rgba(255,165,0, 1)',
         fill: 'origin',
       },
       {

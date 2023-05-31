@@ -61,7 +61,7 @@ export class SpeedComponent {
     console.log(set1)
     let shortenedKeyWords: string[] = []
     keywords.forEach((s)=> {
-      if (s.length > 135) shortenedKeyWords.push(s.substring(0, 135)+'...')
+      if (s.length > 150) shortenedKeyWords.push(s.substring(0, 130)+'...')
       else shortenedKeyWords.push(s)})
     const res = [{data: this.filterService.getNumbers(set0, this.key), label: shortenedKeyWords[0]},{data: this.filterService.getNumbers(set1, this.key), label: shortenedKeyWords[1]},]
     const result: barChartInput = {
