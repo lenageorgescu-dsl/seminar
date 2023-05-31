@@ -2,7 +2,8 @@ This code was written for the software engineering seminar during the spring sem
 ## Generating data
 This application was developed to work on Ubuntu 22.04.
 1. Adjust the paths in docker-compose.yml
-2. Enter the app-folder and run the following commands:  
+2. Create a folder called "search-engine-volumes" on root level
+3. Enter the app-folder and run the following commands:  
 ` 
 (1) npm run docker:reboot  
 `  
