@@ -17,8 +17,6 @@ services:
       - "127.0.0.1:7700:7700"
     volumes:
       - /home/lena/bfh/seminar/search-engine-volumes/meilisearch:/meili_data
-    # environment:
-    #   - MEILI_MASTER_KEY="8e532f2561b39b58a7ba94d15e5fac03bd9301bd031fce0c3568afb5cc91"
   elasticsearch:
     container_name: 'elasticsearch'
     image: docker.elastic.co/elasticsearch/elasticsearch:8.7.1
@@ -30,6 +28,3 @@ services:
     environment: 
       - discovery.type=single-node
       - xpack.security.enabled=false
-
-# du -h --max-depth=1 search-engine-volumes/
-# du -hs search-engine-volumes/
