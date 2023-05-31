@@ -144,6 +144,8 @@ export class ExperimentService implements OnApplicationBootstrap {
   /**Method to aggregate several experiments */
   public compileResults(from: number, to: number) {
     const data: Array<any[]> = [];
+    ++from;
+    --from;
     for (let i = from; i <= to; i++) {
       const res: any[] = JSON.parse(
         readFileSync(
