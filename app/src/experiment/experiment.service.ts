@@ -423,39 +423,50 @@ export class ExperimentService implements OnApplicationBootstrap {
   }
 
   private fillAllGaps(arr: any[]) {
-    let firstIndex;
+    const indexList: number[] = [];
     for (let i = 0; i < arr.length; i++) {
       if (arr[i].cpuPercent != null) {
-        firstIndex = i; //Get first index
-        break;
+        indexList.push(i);
       }
     }
-    let lastIndex;
-    for (let i = 0; i < arr.length; i++) {
-      if (arr[i].cpuPercent != null) lastIndex = i; //Get last index
+    for (let i = 0; i <= indexList[0]; i++) {
+      arr[i].cpuPercent = arr[indexList[0]].cpuPercent; //Set first values
+      arr[i].memPercent = arr[indexList[0]].memPercent;
     }
-    for (let i = 0; i <= firstIndex; i++) {
-      arr[i].cpuPercent = arr[firstIndex].cpuPercent; //Set first values
-      arr[i].memPercent = arr[firstIndex].memPercent;
+    if (indexList.length > 1) {
+      const lastValidValue = arr[indexList[indexList.length - 1]];
+      for (let i = indexList[indexList.length - 1]; i < arr.length; i++) {
+        arr[i].cpuPercent = lastValidValue.cpuPercent; //Set last values
+        arr[i].memPercent = lastValidValue.memPercent;
+      }
+      for (let i = 0; i < indexList[indexList.length - 1]; i++) {
+        if (arr[i].cpuPercent == null) {
+          const s = this.findLastIndex(i, indexList);
+          const lastValue = indexList[s];
+          const nextValue = indexList[s + 1];
+          const totaCpuDifference =
+            arr[nextValue].cpuPercent - arr[lastValue].cpuPercent;
+          const totalMemDifference =
+            arr[nextValue].memPercent - arr[lastValue].memPercent;
+          const indexDifference = nextValue - lastValue;
+          arr[i].cpuPercent =
+            arr[lastValue].cpuPercent +
+            (totaCpuDifference / indexDifference) * (i - lastValue);
+          arr[i].memPercent =
+            arr[lastValue].memPercent +
+            (totalMemDifference / indexDifference) * (i - lastValue);
+        }
+      }
     }
-    for (let i = lastIndex; i < arr.length; i++) {
-      arr[i].cpuPercent = arr[lastIndex].cpuPercent; //Set last values
-      arr[i].memPercent = arr[lastIndex].memPercent;
-    }
-    let lastValidCpu = arr[firstIndex].cpuPercent; //Set in between values
-    let lastValidMem = arr[firstIndex].cpuPercent;
 
-    for (let i = firstIndex; i < arr.length; i++) {
-      //Diese Funktion könnte bei Bedarf noch glätter gemacht werden
-      if (arr[i].cpuPercent == null) {
-        arr[i].cpuPercent = lastValidCpu;
-        arr[i].memPercent = lastValidMem;
-      } else {
-        lastValidCpu = arr[i].cpuPercent;
-        lastValidMem = arr[i].memPercent;
-      }
-    }
     return arr;
+  }
+
+  private findLastIndex(num: number, indexList: number[]): number {
+    for (let i = indexList.length - 1; i >= 0; i--) {
+      if (num > indexList[i]) return i;
+    }
+    return -1;
   }
 }
 
