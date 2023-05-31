@@ -59,7 +59,7 @@ export class CpuComponent {
     const res: lineChartInput = {
       title: `${this.name} Percentage while ${title} the ${collectionName}-Collection`,
       data: data,
-      xLabels: this.filterService.getxLabels(data)
+      xLabels: collectionData[0].cpuTime
     }
     return res;
 
@@ -74,7 +74,7 @@ export class CpuComponent {
      const res: lineChartInput = {
       title: [`${this.name} Percentage while ${title} the ${collectionName}-Collection`, `Query: ${keyword}`],
       data: data,
-      xLabels: this.filterService.getxLabels(data)
+      xLabels: keywordData[0].cpuTime
     }
     return res;
   }

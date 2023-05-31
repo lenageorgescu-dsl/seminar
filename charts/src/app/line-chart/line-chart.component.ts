@@ -83,7 +83,7 @@ export class LineChartComponent {
           position: 'left',
         },
       x: {
-        title: {display: true, text: 'time', align: 'end'}
+        title: {display: true, text: 'time in milliseconds', align: 'end'}
       }
     },
 
