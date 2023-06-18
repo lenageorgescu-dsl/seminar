@@ -162,10 +162,8 @@ export class ExperimentService implements OnApplicationBootstrap {
       res.push(aggregate);
     });
     const title = `${from}-${to}`;
-    writeFileSync(
-      `${ExperimentService.getResultPath()}${title}_experiment_suite.json`,
-      JSON.stringify(res),
-    );
+    const path = `${ExperimentService.getResultPath()}${title}_experiment_suite.json`;
+    this.correctAxis(path, res); //aligns and fills the values for the x-axis
     console.log('FINISHED');
   }
 
@@ -191,7 +189,7 @@ export class ExperimentService implements OnApplicationBootstrap {
     const res: any = matches[0];
     const relevantKeys: string[] = [];
     for (const key in matches[0]) {
-      if (typeof matches[0][key] != 'string') relevantKeys.push(key);
+      if (typeof matches[0][key] != 'string') relevantKeys.push(key); //some keys do not need to be aggregates, e.g. the engine name
     }
     relevantKeys.forEach((s) => {
       const numberArr: any[] = [];
@@ -199,11 +197,12 @@ export class ExperimentService implements OnApplicationBootstrap {
         numberArr.push(matches[i][s]);
       }
       if (typeof numberArr[0] == 'number') res[s] = this.median(numberArr);
-      else res[s] = this.medianArray(numberArr);
+      else res[s] = this.medianArray(numberArr); //method for continuous stats such as cpu percentage
     });
     return res;
   }
 
+  // Calculates the median within an array of numbers
   private median(arr: number[]): number {
     arr = arr.filter((s) => s != undefined);
     if (arr.length == 0) {
@@ -218,6 +217,7 @@ export class ExperimentService implements OnApplicationBootstrap {
     return median;
   }
 
+  // Calculates the median for the continuous stats
   private medianArray(arr: number[][]): number[] {
     const resArr: number[] = [];
     if (arr.length == 0) {
@@ -244,10 +244,7 @@ export class ExperimentService implements OnApplicationBootstrap {
 
   /**Method to get the correct x-Axis-values on the line-charts */
 
-  public correctAxis(path: string) {
-    const data: any[] = JSON.parse(
-      readFileSync(`${ExperimentService.getResultPath()}${path}.json`, 'utf-8'),
-    );
+  private correctAxis(path: string, data: any[]) {
     const rest: any[] = data.filter((s) => s.operation == 'init');
     const total: any[] = [];
     const indexData = this.correctOperatorAxis(data, 'index', 500);
@@ -263,10 +260,7 @@ export class ExperimentService implements OnApplicationBootstrap {
     keywordData.forEach((s) => total.push(s));
     indexData.forEach((s) => total.push(s));
     rest.forEach((s) => total.push(s));
-    writeFileSync(
-      `${ExperimentService.getResultPath()}${path}_axis.json`,
-      JSON.stringify(total),
-    );
+    writeFileSync(path, JSON.stringify(total));
   }
 
   private correctOperatorAxis(

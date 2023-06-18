@@ -19,7 +19,6 @@ When bootstrappig the application, a health check is performed. If it fails, one
 7. An experiment can be run by opening localhost:3000/experiment/:experiment-number in the browser. This will generate a result file in the charts/src/assets folder. 
 8. In between experiments, (1) needs to be run in order to empty the volumes
 9. Once you've run multiple experiments, the results can be aggregated using the /experiment/compile/:from/:to endpoint, where from and to are the experiment-numbers of the first and last experiment to be included in the aggregation. 
-10. In order to display the aggregated results correctly in the line charts, open localhost:3000/experiment/axis/{path of the aggregated file}
 
 ## Visualizing data
 Once you've generated a result file, the results can be visualized as follows:
